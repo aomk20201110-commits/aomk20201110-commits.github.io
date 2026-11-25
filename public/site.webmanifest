@@ -1,0 +1,22 @@
+{
+  "name": "Yurripe — Academic Portfolio",
+  "short_name": "Yurripe",
+  "description": "Academic portfolio of Yurripe — terahertz electromagnetics, metasurfaces, microfluidic sensing and scientific computing.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#04070a",
+  "theme_color": "#04070a",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

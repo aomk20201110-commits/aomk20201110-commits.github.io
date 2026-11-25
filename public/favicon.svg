@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Yurripe monogram">
+  <rect width="64" height="64" rx="14" fill="#04070a" />
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="13.25" fill="none" stroke="#172530" stroke-width="1.5" />
+  <path d="M16 33.5c4 0 4-11 8-11s4 11 8 11 4-11 8-11 4 11 8 11" fill="none" stroke="#6fd8ec" stroke-width="1.6" stroke-linecap="round" opacity="0.5" />
+  <path d="M42.5 17.5 32 33.5 21.5 17.5" fill="none" stroke="#eaf6fc" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M32 33.5V47" fill="none" stroke="#eaf6fc" stroke-width="3.4" stroke-linecap="round" />
+  <circle cx="32" cy="47" r="2.4" fill="#6fd8ec" />
+</svg>
