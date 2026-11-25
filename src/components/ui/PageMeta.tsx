@@ -33,7 +33,7 @@ export function PageMeta({ title, description, path, noindex = false }: PageMeta
   useEffect(() => {
     const fullTitle = `${title} — ${profile.displayName}`;
     const base = profile.siteUrl.replace(/\/$/, "");
-    const canonical = path === "/" ? `${base}/` : `${base}${path}`;
+    const canonical = path === "/" ? `${base}/` : `${base}${path.replace(/\/$/, "")}/`;
     const image = `${base}/og.png`;
     const robots = noindex ? "noindex, nofollow" : "index, follow";
     const locale = lang === "zh" ? "zh_CN" : "en_US";
