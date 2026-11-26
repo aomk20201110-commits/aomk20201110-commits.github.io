@@ -14,6 +14,21 @@ const ssr = await import(pathToFileURL(path.join(root, ".cache/ssr/entry-server.
 const availability = ssr.availability;
 const template = await fs.readFile(path.join(root, "dist/index.html"), "utf8");
 
+// Above-the-fold type is the LCP element on most pages. Preload the two
+// variable faces so the first paint uses the intended typeface and the LCP
+// candidate is not deferred behind CSS/font discovery.
+const assetFiles = await fs.readdir(path.join(root, "dist/assets"));
+const findAsset = (prefix) =>
+  assetFiles.find((file) => file.startsWith(prefix) && file.endsWith(".woff2"));
+const fontPreloads = ["newsreader-latin-wght-normal", "inter-latin-wght-normal"]
+  .map(findAsset)
+  .filter(Boolean)
+  .map(
+    (file) =>
+      `<link rel="preload" href="${basePath}/assets/${file}" as="font" type="font/woff2" crossorigin />`,
+  )
+  .join("\n    ");
+
 const esc = (value) =>
   String(value)
     .replace(/&/g, "&amp;")
@@ -126,6 +141,9 @@ function composePage(html, meta) {
 
   if (alternates) {
     out = out.replace("</head>", `    ${alternates}\n  </head>`);
+  }
+  if (fontPreloads) {
+    out = out.replace("</head>", `    ${fontPreloads}\n  </head>`);
   }
 
   // The application markup replaces the empty mount node. Keep a single root.
