@@ -29,6 +29,14 @@ const fontPreloads = ["newsreader-latin-wght-normal", "inter-latin-wght-normal"]
   )
   .join("\n    ");
 
+// Inline the single compiled stylesheet. It is small (~14 kB gzipped) and
+// render-blocking; inlining removes a round-trip before the hero text paints.
+const inlineStyles = new Map();
+for (const file of assetFiles.filter((entry) => entry.endsWith(".css"))) {
+  const css = await fs.readFile(path.join(root, "dist/assets", file), "utf8");
+  inlineStyles.set(`${basePath}/assets/${file}`, css.replace(/<\/style/gi, "<\\/style"));
+}
+
 const esc = (value) =>
   String(value)
     .replace(/&/g, "&amp;")
@@ -145,6 +153,12 @@ function composePage(html, meta) {
   if (fontPreloads) {
     out = out.replace("</head>", `    ${fontPreloads}\n  </head>`);
   }
+
+  out = out.replace(/<link[^>]*rel="stylesheet"[^>]*>/g, (tag) => {
+    const href = tag.match(/href="([^"]+)"/)?.[1];
+    const css = href ? inlineStyles.get(href) : undefined;
+    return css ? `<style data-inline-css>\n${css}\n    </style>` : tag;
+  });
 
   // The application markup replaces the empty mount node. Keep a single root.
   out = out.replace(/<div id="root">[\s\S]*?<\/div>\s*<noscript>/, `<div id="root">${meta.html}</div>\n    <noscript>`);
