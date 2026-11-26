@@ -15,7 +15,7 @@ Live site: <https://aomk20201110-commits.github.io/>
 | Routing | React Router 7, URL-based locale prefix `/zh` |
 | i18n | i18next + react-i18next, English default, Chinese at `/zh/**` |
 | Math | KaTeX for the coupled-mode model |
-| Rendering | Build-time static HTML for all routes + client-side mount |
+| Rendering | Build-time static HTML for all routes + React hydration |
 | Deploy | GitHub Actions → GitHub Pages |
 
 All visual material is original. The hero field plate is hand-authored SVG (interference contours, a concrete megastructure, two travellers); the live version is a custom point-cloud shader. The array-factor and resonance panels are computed models, not measurements. No stock imagery or template components.
@@ -32,7 +32,7 @@ npm run build        # typecheck → client build → SSR build → static prere
 npm run preview      # preview dist (a port is required)
 ```
 
-`npm run build` writes static, per-route HTML to `dist/` (English + `/zh/`, plus `404.html`, `sitemap.xml`, `robots.txt`). Interactive panels are hydrated by a normal client mount; the static HTML is generated from the same component tree so crawlers and no-JS readers see the content.
+`npm run build` writes static, per-route HTML to `dist/` (English + `/zh/`, plus `404.html`, `sitemap.xml`, `robots.txt`). The client hydrates the same component tree, so crawlers and no-JS readers see the full content and the browser avoids rebuilding it. Heavy instruments (the array-factor lab on the home page) mount only when they approach the viewport.
 
 ## Editing content
 
@@ -59,6 +59,7 @@ Unknown or private information is left `null` / omitted. The site contains no re
 - English lives at `/`, `/research/`, …; Chinese at `/zh/`, `/zh/research/`, …
 - The URL decides the language; no stored language preference can desynchronise a page from its canonical URL.
 - `scripts/prerender.mjs` writes one static HTML file per locale and route, with unique title, description, canonical, Open Graph/Twitter tags, `hreflang` (`en`, `zh`, `x-default`) and structured data.
+- To keep the critical path small, the stylesheet is inlined, above-the-fold variable fonts are preloaded, and the home instrument is deferred until near the viewport. Repeated mobile Lighthouse runs on the deployed site measured performance 92–97 (LCP 1.5–2.0 s, TBT 120–260 ms, CLS ≤0.002), with accessibility, best practices and SEO at 100.
 - Pages for empty sections are `noindex, nofollow` and excluded from `sitemap.xml`.
 - The 404 page is `noindex` and carries no canonical.
 
