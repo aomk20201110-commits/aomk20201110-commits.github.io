@@ -28,7 +28,24 @@
     "field": { "en": "Electronic Science and Technology", "zh": "电子科学与技术" },
     "graduation": { "en": "2029 (expected)", "zh": "2029 年（预计）" },
     "graduationYear": 2029,
+    "startYear": 2025,
     "location": { "en": "Nanjing, China", "zh": "中国 · 南京" },
+    "interests": {
+      "en": [
+        "Electromagnetics",
+        "Terahertz devices",
+        "Metasurfaces",
+        "Microwave and millimetre-wave technology",
+        "Microfluidic sensing",
+        "Computational electromagnetics",
+        "Scientific computing"
+      ],
+      "zh": ["电磁学", "太赫兹器件", "超表面", "微波与毫米波技术", "微流控传感", "计算电磁学", "科学计算"]
+    },
+    "extendedInterests": {
+      "en": ["RF and millimetre-wave integrated circuits", "Integrated photonics", "Intelligent electromagnetic systems"],
+      "zh": ["射频及毫米波集成电路", "集成光子学", "智能电磁系统"]
+    },
     "links": {
       "github": "https://github.com/aomk20201110-commits",
       "email": null,
@@ -72,20 +89,20 @@
       "key": "projects",
       "path": "/projects",
       "index": "03",
-      "title": { "en": "Projects", "zh": "项目" },
+      "title": { "en": "Research & projects", "zh": "科研与项目" },
       "description": {
-        "en": "Engineering work, experiments and computational instruments, documented as they become shareable.",
-        "zh": "工程实践、实验与计算工具，在可以分享时整理记录。"
+        "en": "Publicly documented research training and engineering practice: computational electromagnetics, literature reproducibility, mathematical modelling and embedded electronics.",
+        "zh": "可公开记录的科研训练与工程实践：计算电磁学、文献复现、数学建模与嵌入式电子。"
       }
     },
     {
       "key": "honors",
       "path": "/honors",
       "index": "04",
-      "title": { "en": "Honors", "zh": "荣誉" },
+      "title": { "en": "Honors & achievements", "zh": "荣誉与成果" },
       "description": {
-        "en": "Confirmed academic milestones, awards and the current degree programme.",
-        "zh": "已确认的学业节点、奖项与当前学位项目。"
+        "en": "A verified record of honours and qualifications: two consecutive provincial first prizes in the Chinese Mathematics Competition, an MCM/ICM Honorable Mention, university awards and language certifications.",
+        "zh": "经过核对荣誉与资质记录：连续两届全国大学生数学竞赛省级一等奖、美国大学生数学建模竞赛 Honorable Mention、校级荣誉与语言资质。"
       }
     },
     {
@@ -94,8 +111,8 @@
       "index": "05",
       "title": { "en": "Curriculum vitae", "zh": "个人简历" },
       "description": {
-        "en": "A one-page academic CV generated from the site content, available as an A4 PDF.",
-        "zh": "由本站内容生成的一页学术简历，提供 A4 PDF 下载。"
+        "en": "Academic CV of Yurripe: education, research interests, research and engineering experience, honours, technical skills, certifications and selected activities.",
+        "zh": "Yurripe 的学术简历：教育背景、研究兴趣、科研与工程经历、荣誉、技术能力、资质与社会活动。"
       }
     },
     {
@@ -106,6 +123,16 @@
       "description": {
         "en": "About Yurripe's academic background and research interests, the design language and engineering behind this site, and its content policy.",
         "zh": "关于 Yurripe 的学术背景与研究兴趣、本站的设计语言与工程实现，以及内容原则。"
+      }
+    },
+    {
+      "key": "notes",
+      "path": "/notes",
+      "index": "07",
+      "title": { "en": "Research notes", "zh": "研究笔记" },
+      "description": {
+        "en": "Short, reproducible notes on classical theory, simulation methods and research practice. Published when a note is complete and public.",
+        "zh": "关于经典理论、仿真方法与科研实践的简短、可复现笔记，在内容完整且可公开时发布。"
       }
     }
   ],

@@ -13,12 +13,16 @@ const routes = [
   { path: "/", h1: /fields/i },
   { path: "/research/", h1: /questions/i },
   { path: "/publications/", h1: /written record/i },
-  { path: "/projects/", h1: /built to test/i },
-  { path: "/honors/", h1: /milestones/i },
+  { path: "/projects/", h1: /training, documented/i },
+  { path: "/projects/computational-electromagnetics-training/", h1: /computational electromagnetics/i },
+  { path: "/honors/", h1: /record, checked/i },
   { path: "/cv/", h1: /short version/i },
   { path: "/about/", h1: /about this site/i },
+  { path: "/notes/", h1: /notes, when/i },
   { path: "/zh/", h1: /场/ },
   { path: "/zh/research/", h1: /问题/ },
+  { path: "/zh/projects/", h1: /训练|记录/i },
+  { path: "/zh/honors/", h1: /荣誉|记录/i },
   { path: "/zh/cv/", h1: /一页/ },
   { path: "/zh/about/", h1: /关于/ },
   { path: "/404.html", h1: /signal lost|信号/i, status: 404 },
@@ -58,7 +62,7 @@ function attachDiagnostics(page) {
 }
 
 async function goto(page, route) {
-  await page.goto(`${origin}${route}`, { waitUntil: "networkidle" });
+  await page.goto(`${origin}${route}`, { waitUntil: "load", timeout: 20000 });
   await page.waitForTimeout(environment.slow ? 700 : 350);
 }
 

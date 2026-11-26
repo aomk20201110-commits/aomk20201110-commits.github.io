@@ -5,11 +5,13 @@ import { CtaLink } from "../components/ui/Links";
 import { GithubMark, Rule, Tag, WaveMark } from "../components/ui/Primitives";
 import { useLocale } from "../lib/useLocale";
 import { profile } from "../data/profile";
-import { researchAreas } from "../data/research";
+import { service } from "../data/service";
 
 export default function About() {
   const { t } = useTranslation();
   const { pick } = useLocale();
+  const interests = pick(profile.interests);
+  const extended = pick(profile.extendedInterests);
 
   return (
     <Page meta={{ route: "about" }}>
@@ -38,8 +40,16 @@ export default function About() {
             </div>
 
             <div className="mt-10 flex flex-wrap gap-2">
-              {researchAreas.map((area) => (
-                <Tag key={area.id}>{pick(area.title)}</Tag>
+              {interests.map((interest) => (
+                <Tag key={interest}>{interest}</Tag>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                {t("about.extendedInterestsTitle")}
+              </span>
+              {extended.map((interest) => (
+                <Tag key={interest}>{interest}</Tag>
               ))}
             </div>
 
@@ -118,6 +128,36 @@ export default function About() {
               </p>
             </div>
           </aside>
+        </div>
+
+        <Rule className="mt-16" />
+
+        <div className="mt-12 grid gap-10 md:grid-cols-12 md:gap-10">
+          <div className="md:col-span-7">
+            <h2 className="eyebrow text-glow/80">{t("about.serviceTitle")}</h2>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-mist">
+              {t("about.serviceLede")}
+            </p>
+            <ul className="mt-6 border-t border-line">
+              {service.map((entry) => (
+                <li key={entry.id} className="border-b border-line py-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                    <p className="text-sm leading-snug text-ice">{pick(entry.title)}</p>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                      {pick(entry.period)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-steel">{pick(entry.detail)}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="md:col-span-5">
+            <h2 className="eyebrow text-glow/80">{t("about.publicRecordTitle")}</h2>
+            <p className="mt-4 text-sm leading-relaxed text-mist">
+              {t("about.publicRecordBody")}
+            </p>
+          </div>
         </div>
 
         <Rule className="mt-16" />

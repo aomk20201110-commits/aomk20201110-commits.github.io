@@ -1,20 +1,26 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Page } from "../components/layout/Page";
 import { PageHeader } from "../components/ui/PageHeader";
 import { Eyebrow } from "../components/ui/Primitives";
-import { EmptyState, PreviewBanner, SampleBadge } from "../components/ui/States";
-import { cn } from "../lib/cn";
+import { ArrowLink } from "../components/ui/Links";
 import { useLocale } from "../lib/useLocale";
-import { usePreview } from "../lib/preview";
 import { availability } from "../lib/content";
-import { education, honors, type EducationEntry, type Honor, type HonorCategory } from "../data/honors";
-import { sampleHonors } from "../data/samples";
+import {
+  certifications,
+  certificationsCount,
+} from "../data/certifications";
+import {
+  education,
+  honors,
+  honorsCount,
+  type EducationEntry,
+  type Honor,
+  type HonorCategory,
+} from "../data/honors";
 
 const categoryKeys: Record<HonorCategory, string> = {
-  award: "honors.categoryAward",
+  competition: "honors.categoryCompetition",
   scholarship: "honors.categoryScholarship",
-  service: "honors.categoryService",
   academic: "honors.categoryAcademic",
 };
 
@@ -24,132 +30,224 @@ const statusKeys: Record<EducationEntry["status"], string> = {
   completed: "honors.completed",
 };
 
-function TimelineLine() {
+function HonorRow({ entry, index }: { entry: Honor; index: number }) {
+  const { t } = useTranslation();
+  const { pick } = useLocale();
+  const featured = entry.featured;
+
   return (
-    <span
-      className="absolute bottom-0 left-[7px] top-2 w-px bg-line"
-      aria-hidden="true"
-    />
+    <li id={entry.id} className="scroll-mt-28 border-b border-line">
+      <article className="grid gap-4 py-7 md:grid-cols-12 md:gap-8">
+        <div className="md:col-span-2">
+          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-glow/60">
+            {String(index).padStart(2, "0")}
+          </p>
+          <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+            {t(categoryKeys[entry.category])}
+          </p>
+        </div>
+        <div className="md:col-span-7">
+          <h3 className="font-display text-xl leading-snug tracking-[-0.02em] text-ice md:text-2xl">
+            {pick(entry.title)}
+          </h3>
+          <p className="mt-2 text-sm text-mist">{pick(entry.organisation)}</p>
+          {entry.detail ? (
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-steel">{pick(entry.detail)}</p>
+          ) : null}
+        </div>
+        <div className="md:col-span-3 md:text-right">
+          {entry.rank ? (
+            <span className={featured ? "tag border-glow/50 text-glow" : "tag"}>
+              {pick(entry.rank)}
+            </span>
+          ) : null}
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.12em] text-steel">
+            {pick(entry.period)}
+          </p>
+        </div>
+      </article>
+    </li>
   );
 }
 
-function TimelineDot({ active = false }: { active?: boolean }) {
+function HonorGroup({
+  index,
+  title,
+  lede,
+  entries,
+}: {
+  index: string;
+  title: string;
+  lede?: string;
+  entries: Honor[];
+}) {
+  const { t } = useTranslation();
+  if (entries.length === 0) return null;
   return (
-    <span className="absolute left-0 top-1.5 flex size-[15px] items-center justify-center rounded-full border border-glow/40 bg-void">
-      <span className={cn("size-1.5 rounded-full", active ? "bg-glow" : "bg-glow/50")} />
-    </span>
+    <section className="mt-14 md:mt-18">
+      <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
+        <Eyebrow index={index}>{title}</Eyebrow>
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
+          {String(entries.length).padStart(2, "0")}
+        </span>
+      </div>
+      {lede ? <p className="mt-4 max-w-2xl text-sm leading-relaxed text-steel">{lede}</p> : null}
+      <ol className="mt-4">
+        {entries.map((entry, i) => (
+          <HonorRow key={entry.id} entry={entry} index={i + 1} />
+        ))}
+      </ol>
+      <p className="sr-only">{t("honors.timelineNote")}</p>
+    </section>
   );
 }
 
 export default function Honors() {
   const { t } = useTranslation();
   const { pick } = useLocale();
-  const { preview } = usePreview();
 
-  const awards = useMemo<Honor[]>(() => {
-    const all = preview ? [...honors, ...sampleHonors] : honors;
-    return [...all].sort((a, b) => Number(b.year) - Number(a.year));
-  }, [preview]);
+  const featured = honors.filter((entry) => entry.featured);
+  const competitions = honors.filter((entry) => entry.category === "competition");
+  const scholarships = honors.filter((entry) => entry.category === "scholarship");
+  const academic = honors.filter((entry) => entry.category === "academic");
 
   return (
-    <Page
-      meta={{ route: "honors", noindex: preview || !availability.honors }}
-    >
+    <Page meta={{ route: "honors", noindex: !availability.honors }}>
       <PageHeader
         index="04"
         eyebrow={t("honors.eyebrow")}
         title={t("honors.title")}
         lede={t("honors.lede")}
         aside={
-          <p className="font-mono text-[10px] uppercase leading-relaxed tracking-[0.14em] text-steel md:ml-auto md:max-w-[16rem]">
-            {t("honors.timelineNote")}
-          </p>
+          <div className="space-y-3 font-mono text-[10px] uppercase tracking-[0.14em] text-steel md:text-right">
+            <p>{t("honors.countLabel", { count: honorsCount })}</p>
+            <p>{t("honors.certificationsTitle")} · {String(certificationsCount).padStart(2, "0")}</p>
+            <p className="max-w-[15rem] leading-relaxed">{t("honors.dateNote")}</p>
+          </div>
         }
       />
 
       <div className="shell pb-24">
-        <PreviewBanner />
+        <section className="mt-8 border-y border-line py-8 md:py-10">
+          <div className="grid gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <Eyebrow index="00">{t("honors.rankLabel")}</Eyebrow>
+              <h2 className="mt-5 font-display text-[clamp(1.7rem,3.4vw,2.6rem)] leading-[1.02] tracking-[-0.03em] text-gradient">
+                {t("honors.featuredTitle")}
+              </h2>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-steel">
+                {t("honors.featuredBody")}
+              </p>
+              <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-glow/70">
+                {t("honors.provincialNote")}
+              </p>
+            </div>
 
-        <section className="mt-10">
+            <div className="grid gap-5 sm:grid-cols-2 lg:col-span-8">
+              {featured.map((entry, index) => (
+                <a
+                  key={entry.id}
+                  href={`#${entry.id}`}
+                  className="group border border-line bg-panel/30 p-6 transition-colors hover:border-glow/40"
+                >
+                  <div className="flex items-baseline justify-between gap-4">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-glow/70">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                      {pick(entry.period)}
+                    </span>
+                  </div>
+                  <p className="mt-8 font-display text-3xl leading-none tracking-[-0.03em] text-ice">
+                    {entry.rank ? pick(entry.rank) : ""}
+                  </p>
+                  <p className="mt-3 text-sm leading-snug text-mist">
+                    {pick(entry.title)}
+                  </p>
+                  {entry.id.startsWith("cmc-") ? (
+                    <p className="mt-4 font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                      {t("honors.provincialNote")}
+                    </p>
+                  ) : null}
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-14">
           <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
             <Eyebrow index="01">{t("honors.educationTitle")}</Eyebrow>
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
-              {String(education.length).padStart(2, "0")}
-            </span>
           </div>
-
-          <div className="relative mt-8">
-            <TimelineLine />
-            <ol>
-              {education.map((entry) => (
-                <li key={entry.id} className="relative pl-8 pb-2 md:pl-10">
-                  <TimelineDot active />
-                  <div className="grid gap-5 md:grid-cols-12 md:gap-6">
-                    <div className="md:col-span-3">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-glow/70">
-                        {pick(entry.period)}
-                      </p>
-                      <span className="mt-2 inline-flex border border-glow/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-glow/90">
-                        {t(statusKeys[entry.status])}
-                      </span>
-                    </div>
-                    <div className="md:col-span-9">
-                      <h2 className="font-display text-2xl leading-tight tracking-[-0.02em] text-ice md:text-3xl">
-                        {pick(entry.title)}
-                      </h2>
-                      <p className="mt-2 text-sm text-mist">{pick(entry.institution)}</p>
-                      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-steel">{pick(entry.detail)}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-
-        <section className="mt-16 md:mt-20">
-          <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
-            <Eyebrow index="02">{t("honors.awardsTitle")}</Eyebrow>
-            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
-              {String(awards.length).padStart(2, "0")}
-            </span>
-          </div>
-
-          {awards.length === 0 ? (
-            <EmptyState
-              className="mt-8"
-              title={t("honors.awardsEmptyTitle")}
-              body={t("honors.awardsEmptyBody")}
-            />
-          ) : (
-            <div className="relative mt-8">
-              <TimelineLine />
-              <ol>
-                {awards.map((entry) => (
-                  <li key={entry.id} className="relative pl-8 pb-10 md:pl-10">
-                    <TimelineDot active={!entry.sample} />
-                    <div className="grid gap-4 md:grid-cols-12 md:gap-6">
-                      <div className="md:col-span-3">
-                        <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-glow/70">{entry.year}</p>
-                        <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
-                          {t(categoryKeys[entry.category])}
-                        </p>
-                        {entry.sample ? <SampleBadge className="mt-2" /> : null}
-                      </div>
-                      <div className="md:col-span-9">
-                        <h3 className="font-display text-xl leading-snug text-ice md:text-2xl">{pick(entry.title)}</h3>
-                        <p className="mt-1.5 text-sm text-mist">{pick(entry.organisation)}</p>
-                        {entry.detail ? (
-                          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-steel">{pick(entry.detail)}</p>
-                        ) : null}
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ol>
+          {education.map((entry) => (
+            <div key={entry.id} className="grid gap-4 border-b border-line py-7 md:grid-cols-12 md:gap-8">
+              <div className="md:col-span-3">
+                <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-glow/70">
+                  {pick(entry.period)}
+                </p>
+                <span className="mt-2 inline-flex border border-glow/30 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-glow/90">
+                  {t(statusKeys[entry.status])}
+                </span>
+              </div>
+              <div className="md:col-span-9">
+                <h2 className="font-display text-2xl leading-snug tracking-[-0.02em] text-ice">
+                  {pick(entry.title)}
+                </h2>
+                <p className="mt-2 text-sm text-mist">{pick(entry.institution)}</p>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-steel">{pick(entry.detail)}</p>
+              </div>
             </div>
-          )}
+          ))}
         </section>
+
+        <HonorGroup
+          index="02"
+          title={t("honors.competitionsTitle")}
+          lede={t("honors.competitionsLede")}
+          entries={competitions}
+        />
+        <HonorGroup
+          index="03"
+          title={t("honors.scholarshipsTitle")}
+          entries={scholarships}
+        />
+        <HonorGroup
+          index="04"
+          title={t("honors.academicHonoursTitle")}
+          entries={academic}
+        />
+
+        <section className="mt-14 md:mt-18">
+          <div className="flex items-baseline justify-between gap-4 border-b border-line pb-3">
+            <Eyebrow index="05">{t("honors.certificationsTitle")}</Eyebrow>
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
+              {String(certificationsCount).padStart(2, "0")}
+            </span>
+          </div>
+          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-steel">
+            {t("honors.certificationsLede")}
+          </p>
+          <dl className="mt-4 border-t border-line">
+            {certifications.map((entry) => (
+              <div
+                key={entry.id}
+                className="grid grid-cols-[1fr_auto] items-baseline gap-4 border-b border-line py-4"
+              >
+                <dt className="text-sm text-mist">{pick(entry.title)}</dt>
+                <dd className="font-mono text-[11px] uppercase tracking-[0.12em] text-ice">
+                  {pick(entry.result)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <div className="mt-16 flex flex-wrap items-center justify-between gap-5 border-t border-line pt-6">
+          <p className="max-w-xl font-mono text-[9px] uppercase leading-relaxed tracking-[0.14em] text-steel">
+            {t("honors.dateNote")}
+          </p>
+          <ArrowLink to="/cv">{t("cv.eyebrow")}</ArrowLink>
+        </div>
       </div>
     </Page>
   );

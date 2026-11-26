@@ -7,54 +7,30 @@ import { FieldPlate } from "../components/sections/FieldPlate";
 import { SectionHeader } from "../components/ui/PageHeader";
 import { ArrowLink, CtaLink } from "../components/ui/Links";
 import { Eyebrow, Tag } from "../components/ui/Primitives";
-import { researchAreas } from "../data/research";
-import { publications } from "../data/publications";
+import InstrumentTabs from "../components/lab/InstrumentTabs";
 import { projects } from "../data/projects";
-import { education, honors } from "../data/honors";
+import { honors } from "../data/honors";
+import { certificationsCount } from "../data/certifications";
+import { academicTimeline } from "../data/timeline";
 import { profile } from "../data/profile";
-import { hasAnyArchive } from "../lib/content";
 import { useLocale } from "../lib/useLocale";
 import { siteConfig } from "../lib/seo";
 
 const cvHref = `${import.meta.env.BASE_URL}${siteConfig.cv.pdf.replace(/^\//, "")}`;
-import ArrayFactorLab from "../components/lab/ArrayFactorLab";
-import { DeferredLab } from "../components/lab/DeferredLab";
 
 export default function Home() {
   const { t } = useTranslation();
-  const { lang, pick, href } = useLocale();
-  const showArchive = hasAnyArchive;
+  const { pick, href } = useLocale();
 
-  const facts = [
-    { label: t("home.factsAffiliation"), value: pick(profile.affiliationShort) },
-    { label: t("home.factsDegree"), value: pick(profile.degree) },
-    { label: t("home.factsField"), value: pick(profile.field) },
-    { label: t("home.factsGraduation"), value: String(profile.graduationYear) },
-  ];
+  const featuredProjects = [...projects]
+    .sort((a, b) => b.year - a.year || a.id.localeCompare(b.id))
+    .slice(0, 4);
 
-  const archive = [
-    {
-      key: "publications",
-      to: "/publications",
-      title: t("home.archivePublicationsTitle"),
-      body: t("home.archivePublicationsBody"),
-      count: publications.length,
-    },
-    {
-      key: "projects",
-      to: "/projects",
-      title: t("home.archiveProjectsTitle"),
-      body: t("home.archiveProjectsBody"),
-      count: projects.length,
-    },
-    {
-      key: "honors",
-      to: "/honors",
-      title: t("home.archiveHonorsTitle"),
-      body: t("home.archiveHonorsBody"),
-      count: honors.length + education.length,
-    },
-  ];
+  const featuredHonors = honors.filter((honor) => honor.featured);
+  const timelineItems = academicTimeline.slice(0, 4);
+
+  const interests = pick(profile.interests);
+  const extended = pick(profile.extendedInterests);
 
   return (
     <Page flush meta={{ route: "home" }}>
@@ -74,7 +50,7 @@ export default function Home() {
         </div>
       </div>
 
-      <section id="statement" className="scroll-mt-24 border-t border-line">
+      <section id="profile" className="scroll-mt-24 border-t border-line">
         <div className="shell grid gap-12 py-20 md:py-28 lg:grid-cols-12">
           <div className="lg:col-span-3">
             <Eyebrow index="01">{t("home.statementEyebrow")}</Eyebrow>
@@ -92,23 +68,35 @@ export default function Home() {
             <p className="lede mt-8 max-w-4xl text-[clamp(1.25rem,2.2vw,1.75rem)] leading-[1.5] text-ice">
               {t("home.statementText")}
             </p>
-            <p
-              className={
-                lang === "zh"
-                  ? "mt-6 font-display text-lg leading-relaxed text-steel"
-                  : "mt-6 font-serif text-lg italic text-steel"
-              }
-            >
-              {t("home.statementNote")}
-            </p>
+            <p className="mt-6 font-serif text-lg italic text-steel">{t("home.statementNote")}</p>
 
             <dl className="mt-12 grid grid-cols-2 gap-x-6 gap-y-7 border-t border-line pt-7 sm:grid-cols-4">
-              {facts.map((fact) => (
-                <div key={fact.label}>
-                  <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">{fact.label}</dt>
-                  <dd className="mt-2 text-sm leading-snug text-ice">{fact.value}</dd>
-                </div>
-              ))}
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">
+                  {t("home.factsAffiliation")}
+                </dt>
+                <dd className="mt-2 text-sm leading-snug text-ice">
+                  {pick(profile.affiliationShort)}
+                </dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">
+                  {t("home.factsDegree")}
+                </dt>
+                <dd className="mt-2 text-sm leading-snug text-ice">{pick(profile.degree)}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">
+                  {t("home.factsField")}
+                </dt>
+                <dd className="mt-2 text-sm leading-snug text-ice">{pick(profile.field)}</dd>
+              </div>
+              <div>
+                <dt className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">
+                  {t("home.factsGraduation")}
+                </dt>
+                <dd className="mt-2 text-sm leading-snug text-ice">{profile.graduationYear}</dd>
+              </div>
             </dl>
 
             <div className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
@@ -127,39 +115,54 @@ export default function Home() {
         <div className="shell py-20 md:py-28">
           <SectionHeader
             index="02"
-            eyebrow={t("home.researchEyebrow")}
-            title={t("home.researchTitle")}
-            lede={t("home.researchLede")}
+            eyebrow={t("home.focusEyebrow")}
+            title={t("home.focusTitle")}
+            lede={t("home.focusLede")}
             action={<ArrowLink to="/research">{t("common.viewAll")}</ArrowLink>}
           />
 
-          <ul className="mt-12 border-t border-line">
-            {researchAreas.map((area) => (
-              <li key={area.id} className="border-b border-line">
-                <Link
-                  to={href(`/research#${area.id}`)}
-                  className="group grid gap-3 py-6 transition-colors hover:bg-panel/40 md:grid-cols-12 md:items-baseline md:gap-6 md:py-7"
-                >
-                  <span className="font-mono text-[10px] tracking-[0.16em] text-glow/70 md:col-span-1">
-                    {area.index}
-                  </span>
-                  <div className="md:col-span-5">
-                    <h3 className="font-display text-2xl tracking-[-0.02em] text-ice transition-colors group-hover:text-glow md:text-[1.7rem]">
-                      {pick(area.title)}
-                    </h3>
-                    <p className="mt-1.5 max-w-md text-sm leading-relaxed text-steel">{pick(area.short)}</p>
-                  </div>
-                  <p className="hidden text-sm leading-relaxed text-mist md:col-span-5 md:block">
-                    {pick(area.question)}
-                  </p>
-                  <span className="hidden justify-self-end text-steel transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-glow md:col-span-1 md:block">
-                    <ArrowUpRight className="size-4" aria-hidden="true" />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          <p className="caption mt-5">{t("home.researchNote")}</p>
+          <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-12">
+            <ol className="border-t border-line lg:col-span-8">
+              {interests.map((interest, index) => (
+                <li key={interest} className="border-b border-line">
+                  <Link
+                    to={href("/research")}
+                    className="group flex items-baseline gap-4 py-4 transition-colors hover:bg-panel/30 md:gap-6 md:py-5"
+                  >
+                    <span className="font-mono text-[10px] tracking-[0.16em] text-glow/60">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="font-display text-xl leading-snug tracking-[-0.02em] text-ice transition-colors group-hover:text-glow md:text-2xl">
+                      {interest}
+                    </span>
+                    <ArrowUpRight
+                      className="ml-auto size-4 shrink-0 text-steel transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-glow"
+                      aria-hidden="true"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ol>
+
+            <aside className="lg:col-span-4">
+              <div className="border-t border-line pt-5">
+                <p className="eyebrow">{t("home.focusExtendedLabel")}</p>
+                <ul className="mt-4 space-y-3">
+                  {extended.map((interest) => (
+                    <li
+                      key={interest}
+                      className="border-b border-line pb-3 text-sm leading-relaxed text-mist"
+                    >
+                      {interest}
+                    </li>
+                  ))}
+                </ul>
+                <p className="caption mt-6 max-w-xs normal-case tracking-[0.04em]">
+                  {t("home.focusNote")}
+                </p>
+              </div>
+            </aside>
+          </div>
         </div>
       </section>
 
@@ -167,162 +170,194 @@ export default function Home() {
         <div className="shell py-20 md:py-28">
           <SectionHeader
             index="03"
-            eyebrow={t("home.labEyebrow")}
-            title={t("home.labTitle")}
-            lede={t("home.labLede")}
+            eyebrow={t("home.workEyebrow")}
+            title={t("home.workTitle")}
+            lede={t("home.workLede")}
+            action={<ArrowLink to="/projects">{t("home.workCta")}</ArrowLink>}
           />
 
-          <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-8">
-            <div className="lg:col-span-8">
-              <DeferredLab minHeight={640}>
-                <ArrayFactorLab />
-              </DeferredLab>
-              <p className="caption mt-4 max-w-2xl">{t("home.labCaption")}</p>
-            </div>
-
-            <aside className="lg:col-span-4">
-              <p className="eyebrow border-b border-line pb-3">{t("home.labEyebrow")}</p>
-              <ul className="border-b border-line">
-                <li className="border-b border-line py-5">
-                  <Link to={href("/research")} className="group block">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="font-display text-xl text-ice transition-colors group-hover:text-glow">
-                        {t("home.workArrayTitle")}
-                      </h3>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">01</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-steel">{t("home.workArrayBody")}</p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-glow">
-                      {t("home.workOpen")}
-                      <ArrowUpRight className="size-3" aria-hidden="true" />
-                    </span>
-                  </Link>
-                </li>
-
-                <li className="border-b border-line py-5">
-                  <Link to={href("/research#resonance")} className="group block">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="font-display text-xl text-ice transition-colors group-hover:text-glow">
-                        {t("home.workResonanceTitle")}
-                      </h3>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">02</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-steel">{t("home.workResonanceBody")}</p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-glow">
-                      {t("home.workOpen")}
-                      <ArrowUpRight className="size-3" aria-hidden="true" />
-                    </span>
-                  </Link>
-                </li>
-
-                <li className="border-b border-line py-5">
-                  <div>
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="font-display text-xl text-ice">{t("home.workPlateTitle")}</h3>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">03</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-steel">{t("home.workPlateBody")}</p>
+          <ol className="mt-12 border-t border-line">
+            {featuredProjects.map((project, index) => (
+              <li key={project.id} className="border-b border-line">
+                <Link
+                  to={href(`/projects/${project.id}`)}
+                  className="group grid gap-4 py-7 md:grid-cols-12 md:items-baseline md:gap-6"
+                >
+                  <div className="md:col-span-2">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-glow/60">
+                      {String(index + 1).padStart(2, "0")}
+                    </p>
+                    <p className="mt-2 font-mono text-[9px] uppercase tracking-[0.12em] text-steel">
+                      {pick(project.category)}
+                    </p>
                   </div>
-                </li>
+                  <div className="md:col-span-6">
+                    <h3 className="font-display text-2xl leading-snug tracking-[-0.02em] text-ice transition-colors group-hover:text-glow">
+                      {pick(project.title)}
+                    </h3>
+                    <p className="mt-2 max-w-xl text-sm leading-relaxed text-steel">
+                      {pick(project.summary)}
+                    </p>
+                  </div>
+                  <p className="font-mono text-[9px] uppercase tracking-[0.12em] text-steel md:col-span-2">
+                    {pick(project.status)}
+                  </p>
+                  <span className="hidden justify-self-end text-steel transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-glow md:col-span-2 md:block">
+                    <ArrowUpRight className="size-4" aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
-                <li className="py-5">
-                  <a href={cvHref} download className="group block">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <h3 className="font-display text-xl text-ice transition-colors group-hover:text-glow">
-                        {t("home.workCvTitle")}
-                      </h3>
-                      <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-steel">04</span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-steel">{t("home.workCvBody")}</p>
-                    <span className="mt-3 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-glow">
-                      {t("home.workDownload")}
-                      <ArrowUpRight className="size-3" aria-hidden="true" />
-                    </span>
-                  </a>
-                </li>
-              </ul>
+      <section className="defer-section border-t border-line">
+        <div className="shell py-20 md:py-28">
+          <SectionHeader
+            index="04"
+            eyebrow={t("home.honorsEyebrow")}
+            title={t("home.honorsTitle")}
+            lede={t("home.honorsLede")}
+            action={<ArrowLink to="/honors">{t("home.honorsCta")}</ArrowLink>}
+          />
 
-              <div className="mt-8 flex flex-wrap items-center gap-2">
-                <Tag>{pick(profile.degree)}</Tag>
-                <Tag>{pick(profile.graduation)}</Tag>
-                <Tag>{pick(profile.affiliationShort)}</Tag>
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredHonors.map((honor) => (
+              <div key={honor.id} className="border border-line bg-panel/25 p-5">
+                <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-glow/70">
+                  {pick(honor.period)}
+                </p>
+                <p className="mt-6 font-display text-3xl leading-none tracking-[-0.03em] text-ice">
+                  {honor.rank ? pick(honor.rank) : ""}
+                </p>
+                <p className="mt-3 text-sm leading-snug text-mist">{pick(honor.title)}</p>
               </div>
-            </aside>
+            ))}
+            <div className="flex flex-col justify-between border border-line bg-panel/10 p-5">
+              <div className="flex items-baseline justify-between">
+                <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                  {t("honors.countLabel", { count: honors.length })}
+                </p>
+                <p className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
+                  {t("honors.certificationsTitle")} · {certificationsCount}
+                </p>
+              </div>
+              <p className="mt-6 text-sm leading-relaxed text-steel">{t("honors.featuredBody")}</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {showArchive ? (
-        <section className="defer-section border-t border-line">
-          <div className="shell py-20 md:py-28">
-            <SectionHeader
-              index="04"
-              eyebrow={t("home.archiveEyebrow")}
-              title={t("home.archiveTitle")}
-              lede={t("home.archiveLede")}
-            />
-
-            <ul className="mt-12 border-t border-line">
-              {archive.map((entry) => (
-                <li key={entry.key} className="border-b border-line">
-                  <Link
-                    to={href(entry.to)}
-                    className="group grid gap-3 py-7 transition-colors hover:bg-panel/40 md:grid-cols-12 md:items-baseline md:gap-6"
-                  >
-                    <span className="font-mono text-[10px] text-steel md:col-span-1">
-                      {String(entry.count).padStart(2, "0")}
-                      <span className="ml-2 text-steel/50">{t("home.entriesLabel")}</span>
-                    </span>
-                    <h3 className="font-display text-2xl tracking-[-0.02em] text-ice transition-colors group-hover:text-glow md:col-span-4">
-                      {entry.title}
-                    </h3>
-                    <p className="max-w-xl text-sm leading-relaxed text-steel md:col-span-6">{entry.body}</p>
-                    <span className="hidden justify-self-end text-steel transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-glow md:col-span-1 md:block">
-                      <ArrowUpRight className="size-4" aria-hidden="true" />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-8 flex flex-wrap items-center gap-2">
-              <Tag>{pick(profile.degree)}</Tag>
-              <Tag>{pick(profile.graduation)}</Tag>
-              <Tag>{pick(profile.affiliationShort)}</Tag>
-            </div>
+      <section className="defer-section border-t border-line">
+        <div className="shell py-20 md:py-28">
+          <SectionHeader
+            index="05"
+            eyebrow={t("home.labEyebrow")}
+            title={t("home.labTitle")}
+            lede={t("home.labLede")}
+          />
+          <div className="mt-10">
+            <InstrumentTabs />
           </div>
-        </section>
-      ) : null}
+        </div>
+      </section>
 
       <section className="defer-section border-t border-line">
         <div className="shell grid gap-10 py-20 md:grid-cols-12 md:py-28">
-          <div className="md:col-span-7">
-            <Eyebrow index="05">{t("home.contactEyebrow")}</Eyebrow>
-            <h2 className="display-page mt-6 text-ice">{t("home.contactTitle")}</h2>
-            <p className="lede mt-6">{t("home.contactLede")}</p>
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <CtaLink href={profile.links.github} external>
-                {t("home.contactCta")}
-              </CtaLink>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
-                @aomk20201110-commits
-              </span>
+          <div className="md:col-span-3">
+            <Eyebrow index="06">{t("home.timelineEyebrow")}</Eyebrow>
+            <h2 className="display-page mt-6 text-ice">{t("home.timelineTitle")}</h2>
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-steel">
+              {t("home.timelineLede")}
+            </p>
+            <div className="mt-7">
+              <ArrowLink to="/honors" variant="quiet">
+                {t("home.timelineCta")}
+              </ArrowLink>
             </div>
-            <p className="caption mt-6">{t("home.contactNote")}</p>
           </div>
-          <div className="hidden md:col-span-5 md:block">
-            <div className="relative ml-auto h-full min-h-[16rem] max-w-sm overflow-hidden border border-line bg-panel/30">
-              <div className="grid-field absolute inset-0 opacity-50" />
-              <div className="absolute inset-0 bg-[radial-gradient(80%_80%_at_70%_20%,var(--c-chart-fill),transparent_65%)]" />
-              <div className="relative flex h-full flex-col justify-between p-6">
-                <span className="eyebrow text-steel">{t("home.contactEyebrow")}</span>
-                <div>
-                  <p className="font-serif text-4xl italic leading-none text-ice/90">{profile.displayName}</p>
-                  <p className="mt-3 max-w-[16rem] text-xs leading-relaxed text-steel">
-                    {pick(profile.affiliationShort)} · {pick(profile.graduation)}
-                  </p>
+
+          <ol className="md:col-span-9">
+            {timelineItems.map((item) => (
+              <li key={item.id} className="border-t border-line py-6 last:border-b">
+                <Link
+                  to={href(item.href)}
+                  className="group grid gap-2 md:grid-cols-12 md:items-baseline md:gap-6"
+                >
+                  <span className="font-mono text-sm tabular-nums tracking-[0.12em] text-glow/70 md:col-span-2">
+                    {item.year}
+                  </span>
+                  <div className="md:col-span-9">
+                    <h3 className="font-display text-xl leading-snug tracking-[-0.02em] text-ice transition-colors group-hover:text-glow md:text-2xl">
+                      {pick(item.title)}
+                    </h3>
+                    {item.detail ? (
+                      <p className="mt-1 text-sm text-steel">{pick(item.detail)}</p>
+                    ) : null}
+                  </div>
+                  <span className="hidden justify-self-end text-steel md:col-span-1 md:block">
+                    <ArrowUpRight className="size-4" aria-hidden="true" />
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="defer-section border-t border-line">
+        <div className="shell grid gap-12 py-20 md:py-28 lg:grid-cols-12">
+          <div className="lg:col-span-6">
+            <Eyebrow index="07">{t("home.cvEyebrow")}</Eyebrow>
+            <h2 className="display-page mt-6 text-ice">{t("home.cvTitle")}</h2>
+            <p className="lede mt-6 max-w-xl">{t("home.cvLede")}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <CtaLink href={cvHref} download>
+                {t("cv.download")}
+              </CtaLink>
+              <ArrowLink to="/cv" variant="quiet">
+                {t("home.cvCta")}
+              </ArrowLink>
+            </div>
+            <p className="caption mt-5">{t("cv.downloadNote")}</p>
+          </div>
+
+          <div className="lg:col-span-6">
+            <div className="grid gap-5 border-t border-line pt-6 sm:grid-cols-2">
+              <div>
+                <p className="eyebrow">{t("home.contactEyebrow")}</p>
+                <p className="mt-4 max-w-xs text-sm leading-relaxed text-mist">
+                  {t("home.contactLede")}
+                </p>
+                <div className="mt-5">
+                  <ArrowLink href={profile.links.github} external>
+                    {t("home.contactCta")}
+                  </ArrowLink>
                 </div>
               </div>
+              <div className="border-l border-line pl-5">
+                <p className="eyebrow">{t("honors.academicHonoursTitle")}</p>
+                <ul className="mt-4 space-y-3">
+                  {honors
+                    .filter((honor) => honor.category !== "competition")
+                    .slice(0, 3)
+                    .map((honor) => (
+                      <li key={honor.id} className="text-sm leading-snug text-mist">
+                        {pick(honor.title)}
+                      </li>
+                    ))}
+                </ul>
+                <div className="mt-5 flex flex-wrap gap-2">
+                  <Tag>{pick(profile.degree)}</Tag>
+                  <Tag>{pick(profile.affiliationShort)}</Tag>
+                </div>
+              </div>
+            </div>
+            <div className="mt-8 border-t border-line pt-5">
+              <p className="font-mono text-[9px] uppercase leading-relaxed tracking-[0.12em] text-steel">
+                {t("home.contactNote")}
+              </p>
             </div>
           </div>
         </div>

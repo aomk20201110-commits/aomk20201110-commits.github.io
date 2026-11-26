@@ -2,23 +2,18 @@ import { Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/layout/ScrollProgress";
-import Home from "./pages/Home";
-import Research from "./pages/Research";
-import Publications from "./pages/Publications";
-import Projects from "./pages/Projects";
-import Honors from "./pages/Honors";
-import Cv from "./pages/Cv";
-import About from "./pages/About";
-import NotFound from "./pages/NotFound";
+import { Page, type PageKey } from "./lib/page-loaders";
 
-const routes = [
-  { path: "/", element: <Home /> },
-  { path: "/research", element: <Research /> },
-  { path: "/publications", element: <Publications /> },
-  { path: "/projects", element: <Projects /> },
-  { path: "/honors", element: <Honors /> },
-  { path: "/cv", element: <Cv /> },
-  { path: "/about", element: <About /> },
+const routes: { path: string; page: PageKey }[] = [
+  { path: "/", page: "home" },
+  { path: "/research", page: "research" },
+  { path: "/publications", page: "publications" },
+  { path: "/projects", page: "projects" },
+  { path: "/projects/:id", page: "projectDetail" },
+  { path: "/honors", page: "honors" },
+  { path: "/cv", page: "cv" },
+  { path: "/about", page: "about" },
+  { path: "/notes", page: "notes" },
 ];
 
 export default function App() {
@@ -33,16 +28,16 @@ export default function App() {
       <ScrollProgress />
       <Navbar />
       <Routes>
-        {routes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
+        {routes.map(({ path, page }) => (
+          <Route key={path} path={path} element={<Page page={page} />} />
         ))}
         {routes
           .filter((route) => route.path !== "/")
-          .map((route) => (
-            <Route key={`zh${route.path}`} path={`/zh${route.path}`} element={route.element} />
+          .map(({ path, page }) => (
+            <Route key={`zh${path}`} path={`/zh${path}`} element={<Page page={page} />} />
           ))}
-        <Route path="/zh" element={<Home />} />
-        <Route path="*" element={<NotFound />} />
+        <Route path="/zh" element={<Page page="home" />} />
+        <Route path="*" element={<Page page="notFound" />} />
       </Routes>
       <Footer />
     </div>

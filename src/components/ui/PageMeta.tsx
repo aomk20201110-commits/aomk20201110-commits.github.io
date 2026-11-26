@@ -7,6 +7,10 @@ import { useLocale } from "../../lib/useLocale";
 export type PageMetaProps = {
   route: PageKey;
   noindex?: boolean;
+  /** Override for detail pages that need a record-specific canonical path. */
+  path?: string;
+  title?: string;
+  description?: string;
 };
 
 function setMeta(attribute: "name" | "property", key: string, content: string) {
@@ -34,19 +38,25 @@ function setAlternate(hreflang: string, href: string) {
  * Per-page metadata, updated in place so the pre-rendered tags and the client
  * never disagree or duplicate.
  */
-export function PageMeta({ route, noindex = false }: PageMetaProps) {
+export function PageMeta({ route, noindex = false, path, title, description }: PageMetaProps) {
   const { lang } = useLocale();
 
   useEffect(() => {
-    const seo = route === "notFound" ? notFoundSeo(lang) : pageSeo(route, lang);
+    const baseSeo = route === "notFound" ? notFoundSeo(lang) : pageSeo(route, lang);
+    const seo = {
+      ...baseSeo,
+      path: path ?? baseSeo.path,
+      title: title ?? baseSeo.title,
+      description: description ?? baseSeo.description,
+    };
     const base = config.site.url.replace(/\/+$/, "");
-    const title = fullTitle(seo.title);
+    const pageTitle = fullTitle(seo.title);
     const canonical = route === "notFound" ? "" : canonicalUrl(config.site.url, seo.path, lang);
     const image = `${base}${config.site.ogImage}`;
     const robots = noindex || route === "notFound" ? "noindex, nofollow" : "index, follow";
     const { locale, alternate } = ogLocale(lang);
 
-    document.title = title;
+    document.title = pageTitle;
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
 
     setMeta("name", "description", seo.description);
@@ -54,7 +64,7 @@ export function PageMeta({ route, noindex = false }: PageMetaProps) {
     setMeta("name", "googlebot", robots);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:site_name", config.site.name);
-    setMeta("property", "og:title", title);
+    setMeta("property", "og:title", pageTitle);
     setMeta("property", "og:description", seo.description);
     setMeta("property", "og:url", canonical || base);
     setMeta("property", "og:image", image);
@@ -64,7 +74,7 @@ export function PageMeta({ route, noindex = false }: PageMetaProps) {
     setMeta("property", "og:locale", locale);
     setMeta("property", "og:locale:alternate", alternate);
     setMeta("name", "twitter:card", "summary_large_image");
-    setMeta("name", "twitter:title", title);
+    setMeta("name", "twitter:title", pageTitle);
     setMeta("name", "twitter:description", seo.description);
     setMeta("name", "twitter:image", image);
 
@@ -87,7 +97,7 @@ export function PageMeta({ route, noindex = false }: PageMetaProps) {
       setAlternate("zh", canonicalUrl(config.site.url, zhPath, "zh"));
       setAlternate("x-default", canonicalUrl(config.site.url, enPath, "en"));
     }
-  }, [route, noindex, lang]);
+  }, [route, noindex, lang, path, title, description]);
 
   return null;
 }

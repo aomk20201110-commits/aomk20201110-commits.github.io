@@ -1,6 +1,7 @@
 import { publications } from "../data/publications";
 import { projects } from "../data/projects";
 import { honors } from "../data/honors";
+import { hasNotes } from "../data/notes";
 import { navigation, type PageKey } from "../navigation";
 
 /**
@@ -13,10 +14,16 @@ export const availability = {
   publications: publications.length > 0,
   projects: projects.length > 0,
   honors: honors.length > 0,
+  notes: hasNotes,
 } as const;
 
 export function isSectionAvailable(key: PageKey): boolean {
-  if (key === "publications" || key === "projects" || key === "honors") {
+  if (
+    key === "publications" ||
+    key === "projects" ||
+    key === "honors" ||
+    key === "notes"
+  ) {
     return availability[key];
   }
   return true;

@@ -12,6 +12,7 @@ const siteRoot = `${origin}${basePath}/`;
 
 const ssr = await import(pathToFileURL(path.join(root, ".cache/ssr/entry-server.js")).href);
 const availability = ssr.availability;
+const projects = ssr.projects || [];
 const template = await fs.readFile(path.join(root, "dist/index.html"), "utf8");
 
 // Above-the-fold type is the LCP element on most pages. Preload the two
@@ -193,10 +194,45 @@ async function renderPage(page, lang) {
   return { ...meta, file };
 }
 
+function projectMeta(project, lang) {
+  const pagePath = `/projects/${project.id}`;
+  return {
+    pagePath,
+    langAttribute: lang === "zh" ? "zh-CN" : "en",
+    title: fullTitle(project.title[lang]),
+    description: project.summary[lang],
+    canonical: canonical(pagePath, lang),
+    robots: "index, follow",
+    image: `${origin}${basePath}${config.site.ogImage}`,
+    ogLocale: lang === "zh" ? "zh_CN" : "en_US",
+    ogLocaleAlternate: lang === "zh" ? "en_US" : "zh_CN",
+    indexable: true,
+  };
+}
+
+async function renderProject(project, lang) {
+  const meta = projectMeta(project, lang);
+  const html = await ssr.render(localizedPath(meta.pagePath, lang), lang);
+  const output = composePage(template, { ...meta, html });
+  const file = outputPath(meta.pagePath, lang);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, output, "utf8");
+  return { ...meta, file };
+}
+
 const written = [];
 for (const page of config.pages) {
   for (const lang of config.site.locales) {
     written.push(await renderPage(page, lang));
+  }
+}
+
+// Project records have their own localised detail pages.
+if (availability.projects) {
+  for (const project of projects) {
+    for (const lang of config.site.locales) {
+      written.push(await renderProject(project, lang));
+    }
   }
 }
 
@@ -226,6 +262,15 @@ for (const page of config.pages) {
     sitemapEntries.push(
       `  <url>\n    <loc>${esc(canonical(page.path, lang))}</loc>\n    <lastmod>${config.site.updated}</lastmod>\n  </url>`,
     );
+  }
+}
+if (availability.projects) {
+  for (const project of projects) {
+    for (const lang of config.site.locales) {
+      sitemapEntries.push(
+        `  <url>\n    <loc>${esc(canonical(`/projects/${project.id}`, lang))}</loc>\n    <lastmod>${config.site.updated}</lastmod>\n  </url>`,
+      );
+    }
   }
 }
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${sitemapEntries.join("\n")}\n</urlset>\n`;

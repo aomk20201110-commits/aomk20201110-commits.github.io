@@ -15,6 +15,7 @@ import "./i18n";
 import App from "./App";
 import { LangSync } from "./components/system/LangSync";
 import { MotionPreferenceProvider } from "./lib/motion";
+import { preloadRoute } from "./lib/page-loaders";
 import { PreviewProvider } from "./lib/preview";
 import { ThemeProvider } from "./lib/theme";
 
@@ -39,7 +40,8 @@ const tree = (
   </StrictMode>
 );
 
-// The prerendered HTML comes from the same component tree, so React can adopt
-// the static document instead of rebuilding it. This keeps the first paint
-// independent of the client bundle and significantly reduces main-thread work.
+// Load only the chunk needed by the current static document before adopting it.
+// The server rendered the same route from the same component tree, so React can
+// hydrate the existing mark-up instead of discarding the first paint.
+await preloadRoute(window.location.pathname);
 hydrateRoot(container, tree);

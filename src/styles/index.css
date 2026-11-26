@@ -585,6 +585,36 @@ html[data-motion="reduced"] *::after {
   animation: pulse-dot 3.4s ease-in-out infinite;
 }
 
+.cv-columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 2.5rem;
+}
+.cv-aside {
+  flex: 0 0 34%;
+  min-width: 0;
+}
+.cv-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.cv-aside section + section,
+.cv-main section + section {
+  margin-top: 1.75rem;
+}
+@media (max-width: 767px) {
+  .cv-columns {
+    display: block;
+  }
+  .cv-aside,
+  .cv-main {
+    width: 100%;
+  }
+  .cv-main {
+    margin-top: 2rem;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Print: CV only
  * ------------------------------------------------------------------ */
@@ -599,8 +629,8 @@ html[data-motion="reduced"] *::after {
     color: #0b1117 !important;
   }
   body {
-    font-size: 8.8pt;
-    line-height: 1.4;
+    font-size: 8.2pt;
+    line-height: 1.32;
   }
   .no-print,
   .site-header,
@@ -623,14 +653,14 @@ html[data-motion="reduced"] *::after {
     border: 0 !important;
     color: #0b1117 !important;
     max-width: none !important;
-    padding: 6mm !important;
+    padding: 5mm !important;
     overflow-wrap: anywhere;
-    font-size: 8.8pt;
-    line-height: 1.4;
+    font-size: 8.2pt;
+    line-height: 1.32;
   }
   .print-sheet header {
     display: block !important;
-    padding-bottom: 3mm !important;
+    padding-bottom: 2mm !important;
   }
   .print-sheet header dl {
     display: flex !important;
@@ -681,16 +711,20 @@ html[data-motion="reduced"] *::after {
     font-size: 7.5pt !important;
   }
   .print-sheet .text-sm {
-    font-size: 8.8pt !important;
+    font-size: 8.2pt !important;
   }
   .print-sheet .text-xs {
-    font-size: 8pt !important;
+    font-size: 7.6pt !important;
   }
   .print-sheet .cv-columns {
     display: flex !important;
     align-items: flex-start !important;
-    gap: 8mm !important;
-    margin-top: 4mm !important;
+    gap: 6mm !important;
+    margin-top: 3mm !important;
+  }
+  .print-sheet .cv-aside section + section,
+  .print-sheet .cv-main section + section {
+    margin-top: 3.2mm !important;
   }
   .print-sheet .cv-columns > aside {
     flex: 0 0 34% !important;
