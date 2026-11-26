@@ -1,17 +1,15 @@
-import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 import { Navbar } from "./components/layout/Navbar";
 import { Footer } from "./components/layout/Footer";
 import { ScrollProgress } from "./components/layout/ScrollProgress";
 import Home from "./pages/Home";
-
-const Research = lazy(() => import("./pages/Research"));
-const Publications = lazy(() => import("./pages/Publications"));
-const Projects = lazy(() => import("./pages/Projects"));
-const Honors = lazy(() => import("./pages/Honors"));
-const Cv = lazy(() => import("./pages/Cv"));
-const About = lazy(() => import("./pages/About"));
-const NotFound = lazy(() => import("./pages/NotFound"));
+import Research from "./pages/Research";
+import Publications from "./pages/Publications";
+import Projects from "./pages/Projects";
+import Honors from "./pages/Honors";
+import Cv from "./pages/Cv";
+import About from "./pages/About";
+import NotFound from "./pages/NotFound";
 
 const routes = [
   { path: "/", element: <Home /> },
@@ -22,15 +20,6 @@ const routes = [
   { path: "/cv", element: <Cv /> },
   { path: "/about", element: <About /> },
 ];
-
-function RouteFallback() {
-  return (
-    <div className="flex min-h-svh items-center justify-center" role="status" aria-live="polite">
-      <span className="font-mono text-[10px] uppercase tracking-[0.24em] text-steel">Loading</span>
-      <span className="ml-3 size-1.5 animate-pulse rounded-full bg-glow" aria-hidden="true" />
-    </div>
-  );
-}
 
 export default function App() {
   return (
@@ -43,20 +32,18 @@ export default function App() {
       </a>
       <ScrollProgress />
       <Navbar />
-      <Suspense fallback={<RouteFallback />}>
-        <Routes>
-          {routes.map((route) => (
-            <Route key={route.path} path={route.path} element={route.element} />
+      <Routes>
+        {routes.map((route) => (
+          <Route key={route.path} path={route.path} element={route.element} />
+        ))}
+        {routes
+          .filter((route) => route.path !== "/")
+          .map((route) => (
+            <Route key={`zh${route.path}`} path={`/zh${route.path}`} element={route.element} />
           ))}
-          {routes
-            .filter((route) => route.path !== "/")
-            .map((route) => (
-              <Route key={`zh${route.path}`} path={`/zh${route.path}`} element={route.element} />
-            ))}
-          <Route path="/zh" element={<Home />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
+        <Route path="/zh" element={<Home />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Footer />
     </div>
   );

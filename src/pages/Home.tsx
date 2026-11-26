@@ -1,4 +1,3 @@
-import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
@@ -18,7 +17,7 @@ import { useLocale } from "../lib/useLocale";
 import { siteConfig } from "../lib/seo";
 
 const cvHref = `${import.meta.env.BASE_URL}${siteConfig.cv.pdf.replace(/^\//, "")}`;
-const ArrayFactorLab = lazy(() => import("../components/lab/ArrayFactorLab"));
+import ArrayFactorLab from "../components/lab/ArrayFactorLab";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -174,16 +173,7 @@ export default function Home() {
 
           <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div className="lg:col-span-8">
-              <Suspense
-                fallback={
-                  <div
-                    className="min-h-[560px] border border-line bg-panel/20"
-                    aria-hidden="true"
-                  />
-                }
-              >
-                <ArrayFactorLab />
-              </Suspense>
+              <ArrayFactorLab />
               <p className="caption mt-4 max-w-2xl">{t("home.labCaption")}</p>
             </div>
 

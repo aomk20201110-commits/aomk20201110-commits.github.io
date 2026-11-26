@@ -1,5 +1,5 @@
 import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import "@fontsource-variable/space-grotesk";
@@ -39,10 +39,7 @@ const tree = (
   </StrictMode>
 );
 
-// The prerendered HTML is a complete static document for crawlers and for the
-// first paint. The client mounts over it (rather than hydrating a lazy route
-// tree), which keeps route-level code splitting simple and avoids Suspense
-// mismatches. The markup is generated from the same components, so the visual
-// result is stable.
-container.replaceChildren();
-createRoot(container).render(tree);
+// The prerendered HTML comes from the same component tree, so React can adopt
+// the static document instead of rebuilding it. This keeps the first paint
+// independent of the client bundle and significantly reduces main-thread work.
+hydrateRoot(container, tree);
