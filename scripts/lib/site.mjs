@@ -34,6 +34,18 @@ async function readDist(pathname) {
     const body = await readFile(path.join(dist, candidate));
     return { body, file: candidate, status: 200 };
   } catch {
+    // GitHub Pages redirects extensionless document paths to their trailing
+    // slash form; mirror that resolution locally so hydration sees the same
+    // route HTML it would get in production.
+    if (!path.extname(candidate)) {
+      const nested = path.join(candidate.replace(/\/$/, ""), "index.html");
+      try {
+        const body = await readFile(path.join(dist, nested));
+        return { body, file: nested, status: 200 };
+      } catch {
+        /* fall through to the 404 shell */
+      }
+    }
     if (path.extname(candidate)) {
       return { body: Buffer.from("Not found"), file: candidate, status: 404 };
     }
