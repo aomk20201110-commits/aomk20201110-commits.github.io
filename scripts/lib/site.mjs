@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
-const dist = path.resolve("dist");
+const dist = path.resolve(process.env.DIST_DIR || "dist");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -31,10 +31,14 @@ async function readDist(pathname) {
   let candidate = pathname === "/" ? "/index.html" : pathname;
   if (candidate.endsWith("/")) candidate += "index.html";
   try {
-    return { body: await readFile(path.join(dist, candidate)), file: candidate };
+    const body = await readFile(path.join(dist, candidate));
+    return { body, file: candidate, status: 200 };
   } catch {
-    // SPA fallback: unknown routes are handled by the client router.
-    return { body: await readFile(path.join(dist, "index.html")), file: "/index.html" };
+    if (path.extname(candidate)) {
+      return { body: Buffer.from("Not found"), file: candidate, status: 404 };
+    }
+    // Static export: unknown document paths are served the pre-rendered 404.
+    return { body: await readFile(path.join(dist, "404.html")), file: "/404.html", status: 404 };
   }
 }
 
@@ -51,8 +55,8 @@ export async function serveDist(page, origin = process.env.SITE_ORIGIN || "http:
       await route.continue();
       return;
     }
-    const { body, file } = await readDist(decodeURIComponent(url.pathname));
-    await route.fulfill({ status: 200, body, headers: { "content-type": contentType(file) } });
+    const { body, file, status } = await readDist(decodeURIComponent(url.pathname));
+    await route.fulfill({ status, body, headers: { "content-type": contentType(file) } });
   });
   return origin;
 }

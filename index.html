@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-motion="full">
+<html lang="en" data-motion="full" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -10,8 +10,8 @@
     />
     <meta name="author" content="Yurripe" />
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#04070a" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#080b0a" />
+    <meta name="color-scheme" content="dark light" />
     <link rel="canonical" href="https://aomk20201110-commits.github.io/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -46,8 +46,12 @@
             motion === "reduced" ||
             (!motion && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
           document.documentElement.dataset.motion = reduced ? "reduced" : "full";
-          var lang = localStorage.getItem("yr.lang");
-          if (lang === "zh") document.documentElement.lang = "zh-CN";
+          var theme = localStorage.getItem("yr.theme");
+          if (theme === "light" || theme === "dark") {
+            document.documentElement.dataset.theme = theme;
+          }
+          var lang = location.pathname === "/zh" || location.pathname.indexOf("/zh/") === 0 ? "zh" : "en";
+          document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
         } catch (error) {
           /* preferences are optional; defaults apply */
         }
@@ -73,17 +77,12 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <div style="max-width: 40rem; margin: 4rem auto; padding: 0 1.5rem; color: #a7bccb; font-family: ui-sans-serif, system-ui, sans-serif; line-height: 1.7">
-        <p style="font-family: ui-monospace, monospace; font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: #75899a">
-          Yurripe · Academic portfolio
-        </p>
-        <h1 style="color: #eaf6fc; font-weight: 500; letter-spacing: -0.02em">Fields, surfaces &amp; signals.</h1>
-        <p>
-          This site is an interactive academic portfolio and needs JavaScript to render. Please enable it, or
-          write directly via
-          <a style="color: #6fd8ec" href="https://github.com/aomk20201110-commits">GitHub</a>.
-        </p>
-      </div>
+      <style>
+        [data-reveal] {
+          opacity: 1 !important;
+          transform: none !important;
+        }
+      </style>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>

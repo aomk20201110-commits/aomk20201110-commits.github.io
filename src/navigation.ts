@@ -1,11 +1,13 @@
-export const navigation = [
-  { key: "home", path: "/", index: "00" },
-  { key: "research", path: "/research", index: "01" },
-  { key: "publications", path: "/publications", index: "02" },
-  { key: "projects", path: "/projects", index: "03" },
-  { key: "honors", path: "/honors", index: "04" },
-  { key: "cv", path: "/cv", index: "05" },
-  { key: "about", path: "/about", index: "06" },
-] as const;
+import config from "../site.config.json";
+
+const pageKeys = config.pages.map((page) => page.key);
+
+export type PageKey = (typeof pageKeys)[number];
+
+export const navigation = config.pages.map((page) => ({
+  key: page.key,
+  path: page.path,
+  index: page.index,
+})) as ReadonlyArray<{ key: PageKey; path: string; index: string }>;
 
 export type NavItem = (typeof navigation)[number];

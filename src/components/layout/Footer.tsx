@@ -3,16 +3,19 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { profile } from "../../data/profile";
 import { navigation } from "../../navigation";
+import { visibleNavigation } from "../../lib/content";
 import { useLocale } from "../../lib/useLocale";
 import { useMotionPreference } from "../../lib/motion";
 import { LocaleToggle } from "../ui/LocaleToggle";
 import { MotionToggle } from "../ui/MotionToggle";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { GithubMark, WaveMark } from "../ui/Primitives";
 
 export function Footer() {
   const { t } = useTranslation();
-  const { lang, pick } = useLocale();
+  const { lang, pick, href } = useLocale();
   const { reduced } = useMotionPreference();
+  const links = visibleNavigation.length > 1 ? visibleNavigation : navigation;
 
   const backToTop = () => {
     window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
@@ -23,7 +26,7 @@ export function Footer() {
       <div className="shell py-14 md:py-20">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="md:col-span-5">
-            <Link to="/" className="inline-flex items-center gap-2.5 text-ice" aria-label={`${profile.displayName} — Home`}>
+            <Link to={href("/")} className="inline-flex items-center gap-2.5 text-ice">
               <span className="grid size-8 place-items-center rounded-full border border-white/12 text-glow">
                 <WaveMark className="size-4" />
               </span>
@@ -48,10 +51,10 @@ export function Footer() {
           <nav aria-label="Footer" className="md:col-span-3">
             <h2 className="eyebrow">{t("footer.navTitle")}</h2>
             <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-2.5 md:grid-cols-1">
-              {navigation.map((item) => (
+              {links.map((item) => (
                 <li key={item.path}>
                   <Link
-                    to={item.path}
+                    to={href(item.path)}
                     className="font-mono text-[11px] uppercase tracking-[0.12em] text-mist transition-colors hover:text-ice"
                   >
                     {t(`nav.${item.key}`)}
@@ -76,6 +79,10 @@ export function Footer() {
             <h2 className="eyebrow mt-9">{t("footer.siteTitle")}</h2>
             <div className="mt-4 space-y-3">
               <div className="flex items-center justify-between gap-4">
+                <span className="text-[13px] text-steel">{t("common.theme")}</span>
+                <ThemeToggle withLabel />
+              </div>
+              <div className="flex items-center justify-between gap-4">
                 <span className="text-[13px] text-steel">{t("footer.languageTitle")}</span>
                 <LocaleToggle />
               </div>
@@ -89,10 +96,9 @@ export function Footer() {
 
         <div
           aria-hidden="true"
-          className="mt-16 select-none overflow-hidden font-display text-[clamp(3rem,13vw,11rem)] font-medium leading-[0.8] tracking-[-0.05em] text-white/[0.035]"
-        >
-          YURIPPE
-        </div>
+          data-watermark="YURIPPE"
+          className="footer-watermark mt-16 select-none overflow-hidden font-display text-[clamp(3rem,13vw,11rem)] font-medium leading-[0.8] tracking-[-0.05em] text-white/[0.035]"
+        ></div>
 
         <div className="mt-8 flex flex-col gap-4 border-t border-white/[0.06] pt-6 text-[11px] text-steel sm:flex-row sm:items-center sm:justify-between">
           <p className="font-mono tracking-[0.08em]">{t("footer.copyright")}</p>

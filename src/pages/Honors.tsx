@@ -7,6 +7,7 @@ import { EmptyState, PreviewBanner, SampleBadge } from "../components/ui/States"
 import { cn } from "../lib/cn";
 import { useLocale } from "../lib/useLocale";
 import { usePreview } from "../lib/preview";
+import { availability } from "../lib/content";
 import { education, honors, type EducationEntry, type Honor, type HonorCategory } from "../data/honors";
 import { sampleHonors } from "../data/samples";
 
@@ -52,12 +53,7 @@ export default function Honors() {
 
   return (
     <Page
-      meta={{
-        title: t("meta.honorsTitle"),
-        description: t("meta.honorsDesc"),
-        path: "/honors",
-        noindex: preview,
-      }}
+      meta={{ route: "honors", noindex: preview || !availability.honors }}
     >
       <PageHeader
         index="04"

@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://aomk20201110-commits.github.io/sitemap.xml

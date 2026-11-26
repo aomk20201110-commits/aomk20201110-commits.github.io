@@ -7,6 +7,7 @@ import { EmptyState, PreviewBanner, SampleBadge } from "../components/ui/States"
 import { GithubMark, Tag } from "../components/ui/Primitives";
 import { useLocale } from "../lib/useLocale";
 import { usePreview } from "../lib/preview";
+import { availability } from "../lib/content";
 import { projects } from "../data/projects";
 import { sampleProjects } from "../data/samples";
 import { profile } from "../data/profile";
@@ -24,12 +25,7 @@ export default function Projects() {
 
   return (
     <Page
-      meta={{
-        title: t("meta.projectsTitle"),
-        description: t("meta.projectsDesc"),
-        path: "/projects",
-        noindex: preview,
-      }}
+      meta={{ route: "projects", noindex: preview || !availability.projects }}
     >
       <PageHeader
         index="03"

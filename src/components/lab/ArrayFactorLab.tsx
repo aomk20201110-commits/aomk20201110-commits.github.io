@@ -3,77 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { cn } from "../../lib/cn";
 import { useMotionPreference } from "../../lib/motion";
-
-const N = 8;
-const K = 2 * Math.PI;
-const SAMPLES = 721;
-
-type PatternPoint = { angle: number; af: number; db: number };
-
-function dirichlet(n: number, psi: number) {
-  const half = psi / 2;
-  const denominator = Math.sin(half);
-  if (Math.abs(denominator) < 1e-9) return 1;
-  return Math.sin(n * half) / (n * denominator);
-}
-
-function computePattern(steering: number, spacing: number): PatternPoint[] {
-  const steer = (steering * Math.PI) / 180;
-  const points: PatternPoint[] = [];
-  for (let i = 0; i < SAMPLES; i += 1) {
-    const angle = -90 + (i * 180) / (SAMPLES - 1);
-    const theta = (angle * Math.PI) / 180;
-    const psi = K * spacing * (Math.sin(theta) - Math.sin(steer));
-    const af = Math.abs(dirichlet(N, psi));
-    const db = Math.max(20 * Math.log10(Math.max(af, 1e-4)), -60);
-    points.push({ angle, af, db });
-  }
-  return points;
-}
-
-type Metrics = {
-  peakAngle: number;
-  peakDb: number;
-  hpbw: number | null;
-  sidelobe: number | null;
-  grating: boolean;
-};
-
-function analyse(points: PatternPoint[], steering: number, spacing: number): Metrics {
-  let peakIndex = 0;
-  for (let i = 1; i < points.length; i += 1) {
-    if (points[i].db > points[peakIndex].db) peakIndex = i;
-  }
-
-  let left = peakIndex;
-  while (left > 0 && points[left].db > -3) left -= 1;
-  let right = peakIndex;
-  while (right < points.length - 1 && points[right].db > -3) right += 1;
-
-  let hpbw: number | null = null;
-  if (points[left].db <= -3 || left === 0) {
-    if (right > left) hpbw = points[right].angle - points[left].angle;
-  }
-
-  let sidelobe: number | null = null;
-  for (let i = 1; i < points.length - 1; i += 1) {
-    const isPeak = points[i].db >= points[i - 1].db && points[i].db >= points[i + 1].db;
-    const isMain = Math.abs(i - peakIndex) < 12;
-    if (isPeak && !isMain) {
-      sidelobe = sidelobe === null ? points[i].db : Math.max(sidelobe, points[i].db);
-    }
-  }
-
-  const steerRad = (steering * Math.PI) / 180;
-  const gratingLimit = 1 / (1 + Math.abs(Math.sin(steerRad)));
-  return {
-    peakAngle: points[peakIndex].angle,
-    peakDb: points[peakIndex].db,
-    hpbw,
-    sidelobe,
-    grating: spacing >= gratingLimit - 1e-9,
-  };
-}
+import { arrayPattern, analyseArray } from "../../lib/models/array";
 
 function Slider({
   label,
@@ -136,8 +66,8 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
     return () => cancelAnimationFrame(raf);
   }, [active]);
 
-  const pattern = useMemo(() => computePattern(steering, spacing), [steering, spacing]);
-  const metrics = useMemo(() => analyse(pattern, steering, spacing), [pattern, steering, spacing]);
+  const pattern = useMemo(() => arrayPattern(steering, spacing), [steering, spacing]);
+  const metrics = useMemo(() => analyseArray(pattern, steering, spacing), [pattern, steering, spacing]);
   const peak = pattern.reduce((best, point) => (point.db > best.db ? point : best), pattern[0]);
 
   const width = 640;
@@ -174,15 +104,13 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
   const steerRad = (steering * Math.PI) / 180;
 
   const phaseCells = useMemo(() => {
-    const step = K * spacing * Math.sin(steerRad);
+    const step = 2 * Math.PI * spacing * Math.sin(steerRad);
     return Array.from({ length: 64 }, (_, index) => {
       const column = index % 8;
       const phase = ((-step * column) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const mix = phase / (2 * Math.PI);
-      const r = Math.round(22 + mix * 148);
-      const g = Math.round(64 + mix * 168);
-      const b = Math.round(78 + mix * 168);
-      return { column, phase, color: `rgb(${r} ${g} ${b})` };
+      const color = `color-mix(in oklab, var(--c-chart-line) ${Math.round(14 + mix * 74)}%, var(--c-panel))`;
+      return { column, phase, color };
     });
   }, [spacing, steerRad]);
 
@@ -195,7 +123,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
 
   return (
     <section
-      aria-label={t("lab.title")}
+      aria-label={`${t("lab.eyebrow")} · ${t("lab.title")}`}
       className={cn("overflow-hidden border border-line bg-panel/30", className)}
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3.5 md:px-5">
@@ -332,11 +260,11 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
             <span className="eyebrow text-steel">{t("lab.farField")}</span>
             <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">dB · normalised</span>
           </figcaption>
-          <svg viewBox={`0 0 ${width} ${height}`} className="mt-3 w-full" role="img" aria-label={t("lab.title")}>
+          <svg viewBox={`0 0 ${width} ${height}`} className="chart-svg mt-3 w-full" role="img" aria-label={t("lab.title")}>
             <defs>
               <linearGradient id={`${gradientId}-fill`} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#6fd8ec" stopOpacity="0.24" />
-                <stop offset="100%" stopColor="#6fd8ec" stopOpacity="0" />
+                <stop offset="0%" stopColor="currentColor" stopOpacity="0.24" />
+                <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
               </linearGradient>
               <clipPath id={`${clipId}-plot`}>
                 <rect x={pad.left} y={pad.top} width={plotWidth} height={plotHeight} />
@@ -350,14 +278,14 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
                   x2={width - pad.right}
                   y1={yFor(db)}
                   y2={yFor(db)}
-                  stroke="#172530"
+                  className="chart-grid"
                   strokeDasharray={db === 0 ? undefined : "2 4"}
                 />
                 <text
                   x={pad.left - 7}
                   y={yFor(db) + 3}
                   textAnchor="end"
-                  className="fill-[#75899a] font-mono text-[9px]"
+                  className="chart-axis-label"
                 >
                   {db}
                 </text>
@@ -371,13 +299,13 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
                   x2={xFor(angle)}
                   y1={pad.top}
                   y2={height - pad.bottom}
-                  stroke="#101b24"
+                  className="chart-grid"
                 />
                 <text
                   x={xFor(angle)}
                   y={height - 10}
                   textAnchor="middle"
-                  className="fill-[#75899a] font-mono text-[9px]"
+                  className="chart-axis-label"
                 >
                   {angle}°
                 </text>
@@ -386,23 +314,29 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
 
             <g clipPath={`url(#${clipId}-plot)`}>
               <path d={areaPath} fill={`url(#${gradientId}-fill)`} />
-              <path d={linePath} fill="none" stroke="#6fd8ec" strokeWidth="1.6" strokeLinejoin="round" />
+              <path d={linePath} fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
               <line
                 x1={xFor(steering)}
                 x2={xFor(steering)}
                 y1={pad.top}
                 y2={height - pad.bottom}
-                stroke="#cbdde8"
+                stroke="currentColor"
                 strokeOpacity="0.28"
                 strokeDasharray="3 5"
               />
             </g>
-            <line x1={pad.left} x2={width - pad.right} y1={height - pad.bottom} y2={height - pad.bottom} stroke="#172530" />
+            <line
+              x1={pad.left}
+              x2={width - pad.right}
+              y1={height - pad.bottom}
+              y2={height - pad.bottom}
+              className="chart-grid"
+            />
             <text
               x={xFor(steering)}
               y={pad.top + 10}
               textAnchor="middle"
-              className="fill-[#a7bccb] font-mono text-[9px]"
+              className="chart-axis-label"
             >
               {t("lab.peakLabel")} {peak.angle.toFixed(1)}°
             </text>
@@ -413,7 +347,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
           <figcaption className="eyebrow text-steel">{t("lab.farField")} · polar</figcaption>
           <svg
             viewBox="0 0 280 170"
-            className="mt-2 w-full max-w-[260px] self-center"
+            className="chart-svg mt-2 w-full max-w-[260px] self-center"
             role="img"
             aria-label={`${t("lab.farField")} polar cut`}
           >
@@ -422,7 +356,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
                 key={ratio}
                 d={`M ${polar.cx - polar.radius * ratio} ${polar.cy} A ${polar.radius * ratio} ${polar.radius * ratio} 0 0 1 ${polar.cx + polar.radius * ratio} ${polar.cy}`}
                 fill="none"
-                stroke="#172530"
+                className="chart-grid"
                 strokeDasharray={ratio === 1 ? undefined : "2 4"}
               />
             ))}
@@ -435,7 +369,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
                   y1={polar.cy}
                   x2={polar.cx + polar.radius * Math.sin(rad)}
                   y2={polar.cy - polar.radius * Math.cos(rad)}
-                  stroke="#101b24"
+                  className="chart-grid"
                 />
               );
             })}
@@ -447,24 +381,30 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
                   x={polar.cx + (polar.radius + 13) * Math.sin(rad)}
                   y={polar.cy - (polar.radius + 13) * Math.cos(rad) + 3}
                   textAnchor="middle"
-                  className="fill-[#75899a] font-mono text-[8px]"
+                  className="chart-axis-label"
                 >
                   {angle}°
                 </text>
               );
             })}
-            <path d={polarPath} fill="none" stroke="#6fd8ec" strokeWidth="1.4" strokeLinejoin="round" />
+            <path d={polarPath} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
             <line
               x1={polar.cx}
               y1={polar.cy}
               x2={polar.cx + polar.radius * Math.sin(steerRad)}
               y2={polar.cy - polar.radius * Math.cos(steerRad)}
-              stroke="#cbdde8"
+              stroke="currentColor"
               strokeOpacity="0.28"
               strokeDasharray="2 4"
             />
-            <circle cx={peakPoint.x} cy={peakPoint.y} r="2.6" fill="#eaf6fc" />
-            <line x1={polar.cx - polar.radius} x2={polar.cx + polar.radius} y1={polar.cy} y2={polar.cy} stroke="#172530" />
+            <circle cx={peakPoint.x} cy={peakPoint.y} r="2.6" fill="currentColor" />
+            <line
+              x1={polar.cx - polar.radius}
+              x2={polar.cx + polar.radius}
+              y1={polar.cy}
+              y2={polar.cy}
+              className="chart-grid"
+            />
           </svg>
           <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
             {t("lab.phase")} λ/2

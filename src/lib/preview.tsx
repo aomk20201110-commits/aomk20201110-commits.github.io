@@ -19,12 +19,21 @@ const PreviewContext = createContext<PreviewContextValue | null>(null);
  */
 export function PreviewProvider({ children }: { children: ReactNode }) {
   const [params, setParams] = useSearchParams();
-  const [preview, setPreview] = useState(() => {
-    if (typeof window === "undefined") return false;
+  // Keep the first render identical to the prerendered HTML; opt into preview
+  // state after hydration.
+  const [preview, setPreview] = useState(false);
+
+  useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get(PARAM) === "1";
-    if (fromUrl) window.sessionStorage.setItem(STORAGE_KEY, "1");
-    return fromUrl || window.sessionStorage.getItem(STORAGE_KEY) === "1";
-  });
+    let stored = false;
+    try {
+      if (fromUrl) window.sessionStorage.setItem(STORAGE_KEY, "1");
+      stored = window.sessionStorage.getItem(STORAGE_KEY) === "1";
+    } catch {
+      /* preview storage is optional */
+    }
+    if (fromUrl || stored) setPreview(true);
+  }, []);
 
   useEffect(() => {
     if (params.get(PARAM) !== "1") return;

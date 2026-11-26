@@ -39,6 +39,13 @@ async function autoScroll(page) {
 }
 
 await withChrome(async ({ context }) => {
+  await context.addInitScript(() => {
+    try {
+      localStorage.setItem("yr.theme", "dark");
+    } catch {
+      /* storage unavailable */
+    }
+  });
   for (const viewport of viewports) {
     const page = await context.newPage();
     const origin = await serveDist(page);
@@ -151,8 +158,8 @@ await withChrome(async ({ context }) => {
   if (!previewMeta.robots.some((value) => value.startsWith("noindex"))) {
     layoutIssues.push(`preview mode: robots meta is ${JSON.stringify(previewMeta.robots)}, expected noindex`);
   }
-  if (!previewMeta.canonical.endsWith("/publications")) {
-    layoutIssues.push(`preview mode: canonical is "${previewMeta.canonical}", expected /publications`);
+  if (!previewMeta.canonical.endsWith("/publications/")) {
+    layoutIssues.push(`preview mode: canonical is "${previewMeta.canonical}", expected /publications/`);
   }
   await page.screenshot({ path: `${outDir}/preview-publications.png`, fullPage: false });
   await page.getByRole("button", { name: /exit preview/i }).first().click();
@@ -165,7 +172,7 @@ await withChrome(async ({ context }) => {
     canonical: document.querySelector('link[rel="canonical"]')?.getAttribute("href") ?? "",
     robots: document.querySelector('meta[name="robots"]')?.getAttribute("content") ?? "",
   }));
-  if (!researchMeta.canonical.endsWith("/research")) {
+  if (!researchMeta.canonical.endsWith("/research/")) {
     layoutIssues.push(`metadata: research canonical is "${researchMeta.canonical}"`);
   }
   if (!researchMeta.robots.startsWith("index")) {

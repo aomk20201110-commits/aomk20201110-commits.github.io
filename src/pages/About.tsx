@@ -12,7 +12,7 @@ export default function About() {
   const { pick } = useLocale();
 
   return (
-    <Page meta={{ title: t("meta.aboutTitle"), description: t("meta.aboutDesc"), path: "/about" }}>
+    <Page meta={{ route: "about" }}>
       <PageHeader
         index="06"
         eyebrow={t("about.eyebrow")}
@@ -100,7 +100,7 @@ export default function About() {
                     <WaveMark className="h-5 w-16 text-glow/70" />
                     <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-steel">Identity</span>
                   </div>
-                  <p className="font-display text-[24vw] leading-none tracking-[-0.08em] text-ice/[0.12] md:text-[11rem]">
+                  <p className="font-display text-[24vw] leading-none tracking-[-0.08em] text-ice/[0.16] md:text-[11rem]">
                     {profile.monogram}
                   </p>
                   <div className="flex items-end justify-between">

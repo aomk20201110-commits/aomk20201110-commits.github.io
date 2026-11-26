@@ -13,6 +13,16 @@ const Cv = lazy(() => import("./pages/Cv"));
 const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
+const routes = [
+  { path: "/", element: <Home /> },
+  { path: "/research", element: <Research /> },
+  { path: "/publications", element: <Publications /> },
+  { path: "/projects", element: <Projects /> },
+  { path: "/honors", element: <Honors /> },
+  { path: "/cv", element: <Cv /> },
+  { path: "/about", element: <About /> },
+];
+
 function RouteFallback() {
   return (
     <div className="flex min-h-svh items-center justify-center" role="status" aria-live="polite">
@@ -35,13 +45,15 @@ export default function App() {
       <Navbar />
       <Suspense fallback={<RouteFallback />}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/research" element={<Research />} />
-          <Route path="/publications" element={<Publications />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/honors" element={<Honors />} />
-          <Route path="/cv" element={<Cv />} />
-          <Route path="/about" element={<About />} />
+          {routes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+          {routes
+            .filter((route) => route.path !== "/")
+            .map((route) => (
+              <Route key={`zh${route.path}`} path={`/zh${route.path}`} element={route.element} />
+            ))}
+          <Route path="/zh" element={<Home />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

@@ -8,7 +8,7 @@ export default function NotFound() {
   const { t } = useTranslation();
 
   return (
-    <Page meta={{ title: t("meta.notFoundTitle"), description: t("meta.notFoundDesc"), path: "/404", noindex: true }}>
+    <Page meta={{ route: "notFound", noindex: true }}>
       <div className="shell flex min-h-[calc(100svh-6rem)] flex-col justify-center pb-24">
         <WaveMark className="h-6 w-24 text-glow/60" />
         <p className="mt-8 font-mono text-[11px] uppercase tracking-[0.24em] text-steel">{t("notFound.eyebrow")}</p>

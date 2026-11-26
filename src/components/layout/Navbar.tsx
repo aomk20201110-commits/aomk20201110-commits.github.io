@@ -4,22 +4,27 @@ import { Menu, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link, useLocation } from "react-router-dom";
 import { navigation } from "../../navigation";
+import { visibleNavigation } from "../../lib/content";
+import { stripLocale } from "../../lib/routes";
 import { profile } from "../../data/profile";
 import { cn } from "../../lib/cn";
 import { useLocale } from "../../lib/useLocale";
 import { LocaleToggle } from "../ui/LocaleToggle";
 import { MotionToggle } from "../ui/MotionToggle";
+import { ThemeToggle } from "../ui/ThemeToggle";
 import { GithubMark, WaveMark } from "../ui/Primitives";
 import { ScrollProgress } from "./ScrollProgress";
 
 export function Navbar() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const { pick } = useLocale();
+  const { pick, href } = useLocale();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const links = visibleNavigation.length > 1 ? visibleNavigation : navigation;
+  const barePath = stripLocale(pathname);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 14);
@@ -54,7 +59,8 @@ export function Navbar() {
     };
   }, [open]);
 
-  const isActive = (path: string) => (path === "/" ? pathname === "/" : pathname.startsWith(path));
+  const isActive = (path: string) =>
+    path === "/" ? barePath === "/" : barePath === path || barePath.startsWith(`${path}/`);
 
   return (
     <>
@@ -68,10 +74,9 @@ export function Navbar() {
       >
         <div className="shell flex h-16 items-center justify-between gap-4 md:h-20">
           <Link
-            to="/"
+            to={href("/")}
             onClick={() => setOpen(false)}
             className="group flex shrink-0 items-center gap-2.5"
-            aria-label={`${profile.displayName} — Home`}
           >
             <span className="grid size-8 place-items-center rounded-full border border-white/12 text-glow transition-colors duration-500 group-hover:border-glow/50 md:size-9">
               <WaveMark className="size-4" />
@@ -86,12 +91,12 @@ export function Navbar() {
 
           <nav aria-label="Primary" className="hidden lg:block">
             <ul className="flex items-center gap-5 xl:gap-7">
-              {navigation.map((item) => {
+              {links.map((item) => {
                 const active = isActive(item.path);
                 return (
                   <li key={item.path}>
                     <Link
-                      to={item.path}
+                      to={href(item.path)}
                       aria-current={active ? "page" : undefined}
                       className={cn(
                         "relative block py-2 font-mono text-[10.5px] uppercase tracking-[0.14em] transition-colors duration-300",
@@ -113,7 +118,8 @@ export function Navbar() {
             </ul>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle />
             <LocaleToggle />
             <div className="hidden md:inline-flex">
               <MotionToggle />
@@ -172,12 +178,12 @@ export function Navbar() {
             >
               <nav aria-label="Mobile" className="shell">
                 <ul className="border-t border-white/8">
-                  {navigation.map((item) => {
+                  {links.map((item) => {
                     const active = isActive(item.path);
                     return (
                       <li key={item.path} className="border-b border-white/8">
                         <Link
-                          to={item.path}
+                          to={href(item.path)}
                           onClick={() => setOpen(false)}
                           aria-current={active ? "page" : undefined}
                           className="group flex items-baseline gap-4 py-3.5"
@@ -209,6 +215,10 @@ export function Navbar() {
               </nav>
 
               <div className="shell mt-10 space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <span className="eyebrow">{t("common.theme")}</span>
+                  <ThemeToggle withLabel />
+                </div>
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <span className="eyebrow">{t("footer.languageTitle")}</span>
                   <LocaleToggle />

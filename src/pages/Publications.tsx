@@ -8,6 +8,7 @@ import { EmptyState, PreviewBanner, SampleBadge } from "../components/ui/States"
 import { cn } from "../lib/cn";
 import { useLocale } from "../lib/useLocale";
 import { usePreview } from "../lib/preview";
+import { availability } from "../lib/content";
 import { publications, type Publication, type PublicationStatus, type PublicationType } from "../data/publications";
 import { samplePublications } from "../data/samples";
 import { profile } from "../data/profile";
@@ -89,12 +90,7 @@ export default function Publications() {
 
   return (
     <Page
-      meta={{
-        title: t("meta.publicationsTitle"),
-        description: t("meta.publicationsDesc"),
-        path: "/publications",
-        noindex: preview,
-      }}
+      meta={{ route: "publications", noindex: preview || !availability.publications }}
     >
       <PageHeader
         index="02"

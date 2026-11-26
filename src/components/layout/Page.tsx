@@ -14,8 +14,6 @@ function scrollToHash(hash: string, behavior: ScrollBehavior) {
 
 /**
  * Page shell: metadata plus route-level scroll handling.
- * Scroll resets as the page mounts (after the previous page has exited), and a
- * hash target is honoured with the fixed header offset.
  */
 export function Page({
   children,
@@ -36,7 +34,6 @@ export function Page({
       return () => cancelAnimationFrame(frame);
     }
     window.scrollTo(0, 0);
-    // Only run on mount: hash-only changes are handled by the page itself.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

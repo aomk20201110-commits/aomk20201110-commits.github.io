@@ -8,9 +8,9 @@ await withChrome(async ({ context }) => {
   const page = await context.newPage();
   const origin = await serveDist(page);
   await page.setViewportSize({ width: 1440, height: 1000 });
-  const response = await page.goto(`${origin}/cv`, { waitUntil: "networkidle" });
+  const response = await page.goto(`${origin}/cv/`, { waitUntil: "networkidle" });
   if (!response || !response.ok()) {
-    throw new Error(`Could not load ${origin}/cv (status ${response?.status()})`);
+    throw new Error(`Could not load ${origin}/cv/ (status ${response?.status()})`);
   }
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(500);

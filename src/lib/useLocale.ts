@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import type { Lang, Localized } from "./localized";
+import { withLocale } from "./routes";
 
 export function useLocale() {
   const { i18n } = useTranslation();
@@ -24,5 +25,7 @@ export function useLocale() {
     [lang],
   );
 
-  return { lang, setLang, toggleLang, pick, tx };
+  const href = useCallback((path: string): string => withLocale(path, lang), [lang]);
+
+  return { lang, setLang, toggleLang, pick, tx, href };
 }

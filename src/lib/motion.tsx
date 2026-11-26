@@ -29,9 +29,20 @@ function readOverride(): boolean | null {
 }
 
 export function MotionPreferenceProvider({ children }: { children: ReactNode }) {
-  const systemReduced = useReducedMotion() ?? false;
-  const [override, setOverrideState] = useState<boolean | null>(readOverride);
-  const reduced = override ?? systemReduced;
+  const mediaReduced = useReducedMotion();
+  // Render the same value on the server and on the first client paint, then
+  // apply the stored/system preference after hydration. This keeps hydration
+  // deterministic for visitors who ask for reduced motion.
+  const [override, setOverrideState] = useState<boolean | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setOverrideState(readOverride());
+    setHydrated(true);
+  }, []);
+
+  const systemReduced = hydrated ? (mediaReduced ?? false) : false;
+  const reduced = hydrated ? (override ?? systemReduced) : false;
 
   useEffect(() => {
     document.documentElement.dataset.motion = reduced ? "reduced" : "full";

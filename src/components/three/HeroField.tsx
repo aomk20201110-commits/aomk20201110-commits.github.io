@@ -10,6 +10,7 @@ const waveVertex = /* glsl */ `
   uniform float uTime;
   uniform vec2 uPointer;
   uniform float uPixelRatio;
+  uniform float uLight;
   attribute float aSeed;
   varying vec3 vColor;
   varying float vAlpha;
@@ -40,13 +41,13 @@ const waveVertex = /* glsl */ `
     gl_Position = projectionMatrix * mvPosition;
 
     float energy = smoothstep(-0.35, 0.80, h + (aSeed - 0.5) * 0.16);
-    vec3 low = vec3(0.100, 0.240, 0.330);
-    vec3 mid = vec3(0.420, 0.800, 0.920);
-    vec3 high = vec3(0.880, 0.990, 1.000);
+    vec3 low = mix(vec3(0.100, 0.240, 0.330), vec3(0.020, 0.170, 0.140), uLight);
+    vec3 mid = mix(vec3(0.420, 0.800, 0.920), vec3(0.020, 0.430, 0.360), uLight);
+    vec3 high = mix(vec3(0.880, 0.990, 1.000), vec3(0.000, 0.260, 0.210), uLight);
     vec3 color = mix(low, mid, energy);
     color = mix(color, high, smoothstep(0.76, 1.0, energy));
     vColor = color;
-    vAlpha = 0.28 + energy * 0.78;
+    vAlpha = mix(0.28, 0.40, uLight) + energy * mix(0.78, 0.62, uLight);
 
     float size = (1.1 + energy * 2.6) * uPixelRatio;
     gl_PointSize = clamp(size * (7.4 / max(-mvPosition.z, 0.1)), 1.0, 6.4 * uPixelRatio);
@@ -76,6 +77,7 @@ const gridVertex = /* glsl */ `
 
 const gridFragment = /* glsl */ `
   uniform float uTime;
+  uniform float uLight;
   varying vec2 vUv;
 
   void main() {
@@ -85,8 +87,10 @@ const gridFragment = /* glsl */ `
     float dist = length(vUv - 0.5);
     float fade = smoothstep(0.55, 0.06, dist);
     float ripple = 0.5 + 0.5 * sin(dist * 26.0 - uTime * 0.55);
-    vec3 col = mix(vec3(0.08, 0.18, 0.23), vec3(0.34, 0.76, 0.86), ripple * 0.55);
-    gl_FragColor = vec4(col, line * fade * 0.38);
+    vec3 darkCol = mix(vec3(0.08, 0.18, 0.23), vec3(0.34, 0.76, 0.86), ripple * 0.55);
+    vec3 lightCol = mix(vec3(0.07, 0.26, 0.21), vec3(0.01, 0.46, 0.37), ripple * 0.55);
+    vec3 col = mix(darkCol, lightCol, uLight);
+    gl_FragColor = vec4(col, line * fade * mix(0.38, 0.30, uLight));
   }
 `;
 
@@ -95,11 +99,13 @@ function WaveField({
   reduced,
   mobile,
   running,
+  light,
 }: {
   pointerRef: RefObject<PointerTarget>;
   reduced: boolean;
   mobile: boolean;
   running: boolean;
+  light: boolean;
 }) {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
   const gridRef = useRef<THREE.ShaderMaterial>(null);
@@ -139,11 +145,12 @@ function WaveField({
       uTime: { value: elapsed.current },
       uPointer: { value: new THREE.Vector2(0, 0) },
       uPixelRatio: { value: Math.min(typeof window !== "undefined" ? window.devicePixelRatio : 1, 2) },
+      uLight: { value: light ? 1 : 0 },
     }),
-    [],
+    [light],
   );
 
-  const gridUniforms = useMemo(() => ({ uTime: { value: 0 } }), []);
+  const gridUniforms = useMemo(() => ({ uTime: { value: 0 }, uLight: { value: light ? 1 : 0 } }), [light]);
 
   useFrame((_, delta) => {
     const material = materialRef.current;
@@ -170,7 +177,7 @@ function WaveField({
           uniforms={uniforms}
           transparent
           depthWrite={false}
-          blending={THREE.AdditiveBlending}
+          blending={light ? THREE.NormalBlending : THREE.AdditiveBlending}
         />
       </points>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.82, 0]}>
@@ -211,9 +218,11 @@ function CameraRig({ pointerRef, reduced }: { pointerRef: RefObject<PointerTarge
 export default function HeroField({
   pointerRef,
   active = true,
+  light = false,
 }: {
   pointerRef: RefObject<PointerTarget>;
   active?: boolean;
+  light?: boolean;
 }) {
   const { reduced } = useMotionPreference();
   const mobile = useIsMobile();
@@ -251,7 +260,7 @@ export default function HeroField({
       onError={() => setFailed(true)}
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
     >
-      <WaveField pointerRef={pointerRef} reduced={reduced} mobile={mobile} running={running} />
+      <WaveField pointerRef={pointerRef} reduced={reduced} mobile={mobile} running={running} light={light} />
       <CameraRig pointerRef={pointerRef} reduced={reduced} />
     </Canvas>
   );

@@ -6,7 +6,9 @@ import { Rule } from "../components/ui/Primitives";
 import { ArrowLink } from "../components/ui/Links";
 import ResearchGlyph from "../components/sections/ResearchGlyph";
 import ArrayFactorLab from "../components/lab/ArrayFactorLab";
+import ResonanceLab from "../components/lab/ResonanceLab";
 import { useLocale } from "../lib/useLocale";
+import { availability } from "../lib/content";
 import { researchAreas } from "../data/research";
 
 export default function Research() {
@@ -15,11 +17,7 @@ export default function Research() {
 
   return (
     <Page
-      meta={{
-        title: t("meta.researchTitle"),
-        description: t("meta.researchDesc"),
-        path: "/research",
-      }}
+      meta={{ route: "research" }}
     >
       <PageHeader
         index="01"
@@ -54,7 +52,7 @@ export default function Research() {
                       {pick(area.title)}
                     </h3>
                   </div>
-                  <p className="mt-3 text-sm text-glow/80">{pick(area.short)}</p>
+                  <p className="mt-3 text-sm text-glow">{pick(area.short)}</p>
                   <p className="mt-5 max-w-2xl text-sm leading-relaxed text-mist md:text-[0.9375rem]">
                     {pick(area.description)}
                   </p>
@@ -110,11 +108,40 @@ export default function Research() {
           <ArrayFactorLab className="mt-10 md:mt-12" />
         </section>
 
-        <Rule className="mt-16" />
-        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-lg text-sm text-steel">{t("publications.lede")}</p>
-          <ArrowLink to="/publications">{t("nav.publications")}</ArrowLink>
-        </div>
+        <section
+          id="resonance"
+          className="scroll-mt-28 border-t border-line pt-12 md:pt-16"
+          aria-labelledby="resonance-title"
+        >
+          <div className="grid gap-8 md:grid-cols-12 md:gap-10">
+            <div className="md:col-span-5">
+              <p className="eyebrow text-glow/80">{t("resonance.eyebrow")}</p>
+              <h2
+                id="resonance-title"
+                className="mt-4 font-display text-3xl leading-tight tracking-[-0.025em] text-ice md:text-4xl"
+              >
+                {t("resonance.title")}
+              </h2>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-mist">{t("resonance.lede")}</p>
+            </div>
+            <div className="md:col-span-7 md:self-end">
+              <h3 className="font-mono text-[10px] uppercase tracking-[0.16em] text-steel">{t("resonance.formulaLabel")}</h3>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-steel">{t("resonance.formulaVariables")}</p>
+            </div>
+          </div>
+
+          <ResonanceLab className="mt-10 md:mt-12" />
+        </section>
+
+        {availability.publications ? (
+          <>
+            <Rule className="mt-16" />
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-lg text-sm text-steel">{t("publications.lede")}</p>
+              <ArrowLink to="/publications">{t("nav.publications")}</ArrowLink>
+            </div>
+          </>
+        ) : null}
       </div>
     </Page>
   );

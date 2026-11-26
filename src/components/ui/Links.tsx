@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "../../lib/cn";
+import { useLocale } from "../../lib/useLocale";
 
 type BaseProps = {
   children: ReactNode;
@@ -30,6 +31,7 @@ export function ArrowLink({
   variant = "default",
   external = false,
 }: BaseProps & ({ to: string; href?: never; external?: boolean } | { href: string; to?: never; external?: boolean })) {
+  const { href: localize } = useLocale();
   const classes = cn(
     "group inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-silver transition-colors hover:text-glow",
     variant === "default" && "link-underline",
@@ -49,7 +51,7 @@ export function ArrowLink({
   }
 
   return (
-    <Link to={to ?? "/"} className={classes}>
+    <Link to={to ? localize(to) : localize("/")} className={classes}>
       <Content>{children}</Content>
     </Link>
   );
@@ -72,6 +74,7 @@ export function CtaLink({
   external?: boolean;
   download?: boolean | string;
 }) {
+  const { href: localize } = useLocale();
   const classes = cn("btn group", variant === "primary" ? "btn-primary" : "btn-ghost", className);
   const inner = (
     <>
@@ -97,7 +100,7 @@ export function CtaLink({
   }
 
   return (
-    <Link to={to ?? "/"} className={classes}>
+    <Link to={to ? localize(to) : localize("/")} className={classes}>
       {inner}
     </Link>
   );

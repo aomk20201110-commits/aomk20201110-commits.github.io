@@ -8,8 +8,9 @@ import { useLocale } from "../lib/useLocale";
 import { profile } from "../data/profile";
 import { education } from "../data/honors";
 import { researchAreas } from "../data/research";
+import { siteConfig } from "../lib/seo";
 
-const cvHref = `${import.meta.env.BASE_URL}cv/Yurripe-CV.pdf`;
+const cvHref = `${import.meta.env.BASE_URL}${siteConfig.cv.pdf.replace(/^\//, "")}`;
 
 export default function Cv() {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ export default function Cv() {
   const degree = education[0];
 
   return (
-    <Page meta={{ title: t("meta.cvTitle"), description: t("meta.cvDesc"), path: "/cv" }}>
+    <Page meta={{ route: "cv" }}>
       <div className="no-print">
         <PageHeader
           index="05"

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia(query).matches;
-  });
+  // Start from the SSR-safe value so hydration matches, then adopt the real
+  // media state on the client.
+  const [matches, setMatches] = useState<boolean>(false);
 
   useEffect(() => {
     const mql = window.matchMedia(query);

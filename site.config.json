@@ -1,0 +1,122 @@
+{
+  "site": {
+    "name": "Yurripe",
+    "url": "https://aomk20201110-commits.github.io",
+    "repo": "aomk20201110-commits/aomk20201110-commits.github.io",
+    "defaultLocale": "en",
+    "locales": ["en", "zh"],
+    "updated": "2026-11-26",
+    "ogImage": "/og.png",
+    "themeColor": {
+      "dark": "#080b0a",
+      "light": "#f2efe6"
+    }
+  },
+  "profile": {
+    "displayName": "Yurripe",
+    "monogram": "Y",
+    "role": {
+      "en": "Undergraduate · Electronic Science and Technology",
+      "zh": "本科生 · 电子科学与技术"
+    },
+    "affiliation": {
+      "en": "Nanjing University of Posts and Telecommunications",
+      "zh": "南京邮电大学"
+    },
+    "affiliationShort": { "en": "NJUPT", "zh": "南邮" },
+    "degree": { "en": "B.Eng. candidate", "zh": "工学学士（在读）" },
+    "field": { "en": "Electronic Science and Technology", "zh": "电子科学与技术" },
+    "graduation": { "en": "2029 (expected)", "zh": "2029 年（预计）" },
+    "graduationYear": 2029,
+    "location": { "en": "Nanjing, China", "zh": "中国 · 南京" },
+    "links": {
+      "github": "https://github.com/aomk20201110-commits",
+      "email": null,
+      "orcid": null,
+      "scholar": null,
+      "linkedin": null
+    }
+  },
+  "pages": [
+    {
+      "key": "home",
+      "path": "/",
+      "index": "00",
+      "title": { "en": "Fields, surfaces & signals", "zh": "场、表面与信号" },
+      "description": {
+        "en": "Academic portfolio of Yurripe, an undergraduate in Electronic Science and Technology at Nanjing University of Posts and Telecommunications, working on terahertz electromagnetics, metasurfaces, microfluidic sensing and scientific computing.",
+        "zh": "Yurripe 的学术主页：南京邮电大学电子科学与技术专业本科生，研究方向包括太赫兹电磁学、超表面、微流控传感、计算电磁学与科学计算。"
+      }
+    },
+    {
+      "key": "research",
+      "path": "/research",
+      "index": "01",
+      "title": { "en": "Research", "zh": "研究" },
+      "description": {
+        "en": "Five research directions in terahertz electromagnetics, metasurfaces, microfluidic sensing, computational electromagnetics and scientific computing, with two browser-based analytical models.",
+        "zh": "太赫兹电磁学、超表面、微流控传感、计算电磁学与科学计算五个研究方向，附两个可交互的解析模型。"
+      }
+    },
+    {
+      "key": "publications",
+      "path": "/publications",
+      "index": "02",
+      "title": { "en": "Publications", "zh": "论文" },
+      "description": {
+        "en": "A verified archive of papers, preprints and conference records. Entries appear only after they are public.",
+        "zh": "经过核实的期刊、预印本与会议记录档案，仅在公开后列出条目。"
+      }
+    },
+    {
+      "key": "projects",
+      "path": "/projects",
+      "index": "03",
+      "title": { "en": "Projects", "zh": "项目" },
+      "description": {
+        "en": "Engineering work, experiments and computational instruments, documented as they become shareable.",
+        "zh": "工程实践、实验与计算工具，在可以分享时整理记录。"
+      }
+    },
+    {
+      "key": "honors",
+      "path": "/honors",
+      "index": "04",
+      "title": { "en": "Honors", "zh": "荣誉" },
+      "description": {
+        "en": "Confirmed academic milestones, awards and the current degree programme.",
+        "zh": "已确认的学业节点、奖项与当前学位项目。"
+      }
+    },
+    {
+      "key": "cv",
+      "path": "/cv",
+      "index": "05",
+      "title": { "en": "Curriculum vitae", "zh": "个人简历" },
+      "description": {
+        "en": "A one-page academic CV generated from the site content, available as an A4 PDF.",
+        "zh": "由本站内容生成的一页学术简历，提供 A4 PDF 下载。"
+      }
+    },
+    {
+      "key": "about",
+      "path": "/about",
+      "index": "06",
+      "title": { "en": "About", "zh": "关于" },
+      "description": {
+        "en": "About Yurripe's academic background and research interests, the design language and engineering behind this site, and its content policy.",
+        "zh": "关于 Yurripe 的学术背景与研究兴趣、本站的设计语言与工程实现，以及内容原则。"
+      }
+    }
+  ],
+  "notFound": {
+    "title": { "en": "Signal lost", "zh": "信号丢失" },
+    "description": {
+      "en": "The requested page could not be found.",
+      "zh": "请求的页面不存在。"
+    }
+  },
+  "cv": {
+    "pdf": "/cv/Yurripe-CV.pdf"
+  }
+}

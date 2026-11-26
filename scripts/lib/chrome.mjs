@@ -41,6 +41,18 @@ export async function withChrome(fn) {
     }
   }
 
+  // CI uses Playwright's managed Chromium. Local restricted runs attach over
+  // CDP instead (see above), because spawning the browser from Node is blocked.
+  if (!process.env.CHROME_PATH) {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    try {
+      return await fn({ browser, context });
+    } finally {
+      await browser.close().catch(() => {});
+    }
+  }
+
   const profileDir = path.resolve(".cache/chrome-profile");
   await mkdir(profileDir, { recursive: true });
 

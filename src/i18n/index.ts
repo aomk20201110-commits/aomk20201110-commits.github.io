@@ -2,20 +2,13 @@ import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { en } from "./locales/en";
 import { zh } from "./locales/zh";
-import { isLang, type Lang } from "../lib/localized";
+import type { Lang } from "../lib/localized";
 
-const STORAGE_KEY = "yr.lang";
-
+/** The URL is the source of truth for language; English is the default. */
 function initialLanguage(): Lang {
   if (typeof window === "undefined") return "en";
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (isLang(stored)) return stored;
-  } catch {
-    /* storage can be unavailable in private modes */
-  }
-  /* English is the default regardless of the browser locale. */
-  return "en";
+  const path = window.location.pathname;
+  return path === "/zh" || path.startsWith("/zh/") ? "zh" : "en";
 }
 
 void i18n.use(initReactI18next).init({
@@ -33,12 +26,7 @@ void i18n.use(initReactI18next).init({
 });
 
 i18n.on("languageChanged", (lng) => {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(STORAGE_KEY, lng);
-  } catch {
-    /* ignore */
-  }
+  if (typeof document === "undefined") return;
   document.documentElement.lang = lng === "zh" ? "zh-CN" : "en";
 });
 
