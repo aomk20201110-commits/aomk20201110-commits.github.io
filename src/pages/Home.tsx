@@ -18,6 +18,7 @@ import { siteConfig } from "../lib/seo";
 
 const cvHref = `${import.meta.env.BASE_URL}${siteConfig.cv.pdf.replace(/^\//, "")}`;
 import ArrayFactorLab from "../components/lab/ArrayFactorLab";
+import { DeferredLab } from "../components/lab/DeferredLab";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -173,7 +174,9 @@ export default function Home() {
 
           <div className="mt-12 grid gap-10 lg:grid-cols-12 lg:gap-8">
             <div className="lg:col-span-8">
-              <ArrayFactorLab />
+              <DeferredLab minHeight={640}>
+                <ArrayFactorLab />
+              </DeferredLab>
               <p className="caption mt-4 max-w-2xl">{t("home.labCaption")}</p>
             </div>
 
