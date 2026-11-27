@@ -43,7 +43,7 @@ jobs:
           --label v3.1
           --runs 5
           --diagnostic-runs 2
-          --out .lighthouse
+          --out lighthouse-report
           --enforce
 
       - name: Upload reports
@@ -51,5 +51,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-v3.1
-          path: .lighthouse
+          path: lighthouse-report
           retention-days: 30

@@ -21,19 +21,34 @@ import path from "node:path";
 import lighthouse from "lighthouse";
 
 const argv = process.argv.slice(2);
-const args = Object.fromEntries(
-  argv.reduce((pairs, arg) => {
-    if (!arg.startsWith("--")) return pairs;
-    const [key, ...rest] = arg.slice(2).split("=");
-    const value = rest.length ? rest.join("=") : "true";
-    pairs.push([key, value]);
-    return pairs;
-  }, []),
-);
+const args = {};
+for (let index = 0; index < argv.length; index += 1) {
+  const arg = argv[index];
+  if (!arg.startsWith("--")) continue;
+  const body = arg.slice(2);
+  if (body.includes("=")) {
+    const [key, ...rest] = body.split("=");
+    args[key] = rest.join("=");
+  } else if (index + 1 < argv.length && !argv[index + 1].startsWith("--")) {
+    args[body] = argv[++index];
+  } else {
+    args[body] = "true";
+  }
+}
 
 const url = args.url ?? "http://127.0.0.1:4173/";
-const baselineRuns = Number(args.runs ?? 5);
-const diagnosticRuns = Number(args["diagnostic-runs"] ?? 2);
+if (args.url === "true" || !/^https?:\/\//.test(url)) {
+  throw new Error(`Expected --url <http(s) URL>, received: ${args.url ?? "(none)"}`);
+}
+const runCount = (name, fallback) => {
+  const value = Number(args[name] ?? fallback);
+  if (!Number.isInteger(value) || value < 1 || value > 10) {
+    throw new Error(`Expected --${name} to be an integer between 1 and 10, received: ${args[name] ?? "(none)"}`);
+  }
+  return value;
+};
+const baselineRuns = runCount("runs", 5);
+const diagnosticRuns = runCount("diagnostic-runs", 2);
 const outDir = path.resolve(args.out ?? ".cache/lighthouse");
 const label = args.label ?? new URL(url).host;
 const enforce = args.enforce === "true";
