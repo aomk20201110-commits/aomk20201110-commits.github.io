@@ -1,0 +1,55 @@
+name: Lighthouse performance
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy to GitHub Pages"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: lighthouse
+  cancel-in-progress: true
+
+jobs:
+  mobile:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run mobile Lighthouse (median of 5 + diagnostics)
+        env:
+          CHROME_PATH: /usr/bin/google-chrome-stable
+        run: >-
+          node scripts/lighthouse.mjs
+          --url https://aomk20201110-commits.github.io/
+          --label v3.1
+          --runs 5
+          --diagnostic-runs 2
+          --out .lighthouse
+          --enforce
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-v3.1
+          path: .lighthouse
+          retention-days: 30
