@@ -18,7 +18,7 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
-import chromeLauncher from "chrome-launcher";
+import { launch as launchChrome } from "chrome-launcher";
 import lighthouse from "lighthouse";
 
 const argv = process.argv.slice(2);
@@ -229,7 +229,7 @@ const variants = only ?? ["baseline", "fast-network", "no-cpu", "no-js", "no-fon
 const summaries = [];
 const allRuns = [];
 
-const chrome = await chromeLauncher.launch({
+const chrome = await launchChrome({
   chromeFlags: [
     "--headless=new",
     "--no-sandbox",
