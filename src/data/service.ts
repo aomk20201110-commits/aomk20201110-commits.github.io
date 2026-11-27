@@ -29,7 +29,7 @@ export const service: ServiceEntry[] = [
     period: l("2026", "2026 年"),
     title: l("“Love Back to Alma Mater” volunteer talk — speaker", "“爱回母校”志愿宣讲 — 分享人"),
     detail: l(
-      "Shared university study experience and perspectives on choosing a major with prospective students.",
+      "Shared university study experience and perspectives on choosing a major with high-school students considering university.",
       "向高中生分享大学学习经验与专业选择体会。",
     ),
   },

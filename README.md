@@ -82,7 +82,7 @@ Any unknown field stays `null` or is omitted. A record is added only when it is 
 
 ## Privacy boundaries
 
-The published record is limited to the public handle, university and programme, years, city, research interests, verified public honours and qualifications, public method-level training descriptions, and the GitHub profile. The repository intentionally contains no GPA, transcript, student number, real name, private email, phone number, school name, supervisor or team-member details, unpublished manuscripts, simulation source files, raw data or credentials.
+The published record is limited to the public handle, university and programme, years, city, research interests, verified public honours and qualifications, public method-level training descriptions, and the GitHub profile. The repository intentionally contains no GPA, transcript, student number, real name, private email, phone number, school name beyond the degree affiliation stated in the profile, supervisor or team-member details, unpublished manuscripts, simulation source files, raw data or credentials.
 
 Project detail pages describe methods, tools, validation habits and public boundaries only. They do not publish parameters, unpublished questions, results or source files. The same rule applies to the field plate and both interactive instruments: they are conceptual or mathematical models.
 
@@ -102,6 +102,16 @@ Start-Process "C:\Program Files\Google\Chrome\Application\chrome.exe" `
 $env:CDP_URL = "http://127.0.0.1:9333"
 npm run cv:pdf
 ```
+
+## Fonts
+
+The five families are self-hosted as Latin subsets in `src/assets/fonts/`,
+declared by `src/styles/fonts.css`. `npm run fonts:subset` regenerates them from
+the Fontsource packages; it is a build-time tool, not part of `npm run build`,
+so re-run it whenever public copy introduces new characters. The subsets keep
+the Fontsource family names, weight ranges and variable axes, so the typography
+and layout are unchanged. The original SIL Open Font License texts are kept in
+`src/assets/fonts/licenses/`.
 
 ## Verification
 
@@ -127,6 +137,18 @@ Pushes to `main` trigger `.github/workflows/deploy.yml`: install → build → v
 - any other repository → served from `/<repo>/`
 
 For a custom domain, add `public/CNAME`, update `site.config.json` (`site.url`) and rebuild. Canonical URLs, the sitemap and robots all derive from that value.
+
+After a successful deploy, `.github/workflows/performance.yml` runs five mobile Lighthouse passes against the live URL and fails if the median Performance score is below 90 or Accessibility / Best Practices / SEO are not 100. It also records diagnostic variants (fast network, no CPU throttling, JavaScript blocked, fonts blocked) so network, script and font cost stay separable. The raw JSON and `summary.md` are uploaded as the `lighthouse-v3.1` artifact.
+
+## Search Console
+
+`sitemap.xml` and `robots.txt` are generated at build time by `scripts/prerender.mjs` and cover only indexable pages; empty sections and `?demo=1` URLs are excluded. To verify the property without committing the token:
+
+1. Add the Search Console verification token as a repository **Actions variable** (or secret) named `GOOGLE_SITE_VERIFICATION`.
+2. Re-run the deploy workflow. `scripts/prerender.mjs` injects `<meta name="google-site-verification" content="…">` into every prerendered page's head.
+3. In Search Console, verify the URL-prefix property `https://aomk20201110-commits.github.io/` and submit `https://aomk20201110-commits.github.io/sitemap.xml`.
+
+The token is optional: with no variable/secret configured the build simply omits the meta tag.
 
 ## Structure
 
@@ -157,4 +179,4 @@ scripts/             build/prerender, CV, OG, QA, tests
 - Preview mode (`?demo=1`) is for layout review only; demo pages are `noindex`, never enter the sitemap, and can be dismissed.
 - Contact is handled through the public GitHub profile only.
 
-Fonts are bundled with Fontsource (Newsreader, Space Grotesk, Inter, Instrument Serif, IBM Plex Mono) under the SIL Open Font License. Code and original artwork © Yurripe.
+Fonts are self-hosted subsets of the Fontsource families (Newsreader, Space Grotesk, Inter, Instrument Serif, IBM Plex Mono) under the SIL Open Font License. Code and original artwork © Yurripe.

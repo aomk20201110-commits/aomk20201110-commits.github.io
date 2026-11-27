@@ -57,8 +57,8 @@ export const honors: Honor[] = [
   {
     id: "cmc-18",
     title: l(
-      "18th Chinese Mathematics Competition (Non-Mathematics Category A)",
-      "第十八届全国大学生数学竞赛（非数学类 A 组）",
+      "18th Chinese Mathematics Competition (CMC) — Non-Mathematics Category A, provincial preliminary",
+      "第十八届全国大学生数学竞赛（非数学类 A 组）省级初赛",
     ),
     organisation: l("Chinese Mathematics Competition", "中国大学生数学竞赛"),
     category: "competition",
@@ -75,8 +75,8 @@ export const honors: Honor[] = [
   {
     id: "cmc-17",
     title: l(
-      "17th Chinese Mathematics Competition (Non-Mathematics Category A)",
-      "第十七届全国大学生数学竞赛（非数学类 A 组）",
+      "17th Chinese Mathematics Competition (CMC) — Non-Mathematics Category A, provincial preliminary",
+      "第十七届全国大学生数学竞赛（非数学类 A 组）省级初赛",
     ),
     organisation: l("Chinese Mathematics Competition", "中国大学生数学竞赛"),
     category: "competition",
@@ -125,7 +125,7 @@ export const honors: Honor[] = [
     period: l("23rd edition", "第二十三届"),
     year: 2025,
     timelineYear: 2025,
-    rank: l("Second Prize", "二等奖"),
+    rank: l("Second Prize, Provincial Level", "省级二等奖"),
   },
   {
     id: "word-master-6",
@@ -136,7 +136,11 @@ export const honors: Honor[] = [
     organisation: l("SFLEP Word Master Cup", "外教社·词达人杯"),
     category: "competition",
     period: l("6th edition", "第六届"),
-    rank: l("First Prize", "一等奖"),
+    rank: l("First Prize, Jiangsu Division", "江苏赛区一等奖"),
+    detail: l(
+      "Division-level award in the Jiangsu regional round; not a national-final prize.",
+      "江苏赛区（省级赛区）奖项，并非全国总决赛奖项。",
+    ),
   },
   {
     id: "scholarship-2025-2026",

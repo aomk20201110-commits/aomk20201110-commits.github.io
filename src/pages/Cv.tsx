@@ -73,7 +73,7 @@ export default function Cv() {
                     rel="noreferrer noopener"
                     className="text-mist underline decoration-line underline-offset-4 transition-colors hover:text-glow"
                   >
-                    @aomk20201110-commits
+                    {t("cv.githubLink")}
                   </a>
                 </dd>
               </div>

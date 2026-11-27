@@ -21,7 +21,7 @@ const template = await fs.readFile(path.join(root, "dist/index.html"), "utf8");
 const assetFiles = await fs.readdir(path.join(root, "dist/assets"));
 const findAsset = (prefix) =>
   assetFiles.find((file) => file.startsWith(prefix) && file.endsWith(".woff2"));
-const fontPreloads = ["newsreader-latin-wght-normal", "inter-latin-wght-normal"]
+const fontPreloads = ["newsreader-latin-subset", "inter-latin-subset"]
   .map(findAsset)
   .filter(Boolean)
   .map(
@@ -142,6 +142,14 @@ function composePage(html, meta) {
   out = replaceNameMeta(out, "twitter:description", meta.description);
   out = replaceNameMeta(out, "twitter:image", meta.image);
   out = replaceCanonical(out, meta.canonical);
+
+  // Google Search Console verification token is injected at build time so the
+  // token never has to live in the repository. Configure it as a repository
+  // secret/variable named GOOGLE_SITE_VERIFICATION, then redeploy.
+  const siteVerification = (process.env.GOOGLE_SITE_VERIFICATION || "").trim();
+  if (siteVerification) {
+    out = replaceNameMeta(out, "google-site-verification", siteVerification, true);
+  }
 
   out = out.replace(
     /<script type="application\/ld\+json">[\s\S]*?<\/script>/,

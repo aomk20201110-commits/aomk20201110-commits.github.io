@@ -2,13 +2,7 @@ import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
-import "@fontsource-variable/space-grotesk";
-import "@fontsource-variable/inter";
-import "@fontsource-variable/newsreader";
-import "@fontsource/ibm-plex-mono/400.css";
-import "@fontsource/ibm-plex-mono/500.css";
-import "@fontsource/instrument-serif/400.css";
-import "@fontsource/instrument-serif/400-italic.css";
+import "./styles/fonts.css";
 import "./styles/index.css";
 
 import "./i18n";

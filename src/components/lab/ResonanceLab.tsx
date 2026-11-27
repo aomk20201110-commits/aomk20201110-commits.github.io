@@ -117,7 +117,7 @@ export default function ResonanceLab({ className }: { className?: string }) {
         <div className="flex items-center gap-2">
           <span className="size-1.5 bg-glow" aria-hidden="true" />
           <h3 id="resonance-lab-title" className="font-mono text-[10px] uppercase tracking-[0.16em] text-mist">
-            {t("resonance.formulaLabel")} · single port
+            {t("resonance.formulaLabel")} · {t("resonance.singlePort")}
           </h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">

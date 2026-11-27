@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Pause, Play, RotateCcw } from "lucide-react";
 import { cn } from "../../lib/cn";
 import { useMotionPreference } from "../../lib/motion";
-import { arrayPattern, analyseArray } from "../../lib/models/array";
+import { ARRAY_N, arrayPattern, analyseArray } from "../../lib/models/array";
 
 function Slider({
   label,
@@ -105,8 +105,8 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
 
   const phaseCells = useMemo(() => {
     const step = 2 * Math.PI * spacing * Math.sin(steerRad);
-    return Array.from({ length: 64 }, (_, index) => {
-      const column = index % 8;
+    return Array.from({ length: ARRAY_N }, (_, index) => {
+      const column = index;
       const phase = ((-step * column) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
       const mix = phase / (2 * Math.PI);
       const color = `color-mix(in oklab, var(--c-chart-line) ${Math.round(14 + mix * 74)}%, var(--c-panel))`;
@@ -129,9 +129,9 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line px-4 py-3.5 md:px-5">
         <div className="flex items-center gap-2.5">
           <span className="size-1.5 bg-glow" />
-          <span className="eyebrow text-mist">Array factor · live model</span>
+          <span className="eyebrow text-mist">{t("lab.liveModel")}</span>
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-steel sm:inline">
-            8 × 8
+            {t("lab.elementCount", { elements: ARRAY_N })}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -225,7 +225,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
           <div className="flex h-full flex-col justify-between gap-2 border-l-0 border-line md:border-l md:pl-5">
             <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.14em] text-steel">
               <span>{t("lab.elements")}</span>
-              <span className="text-ice">64</span>
+              <span className="text-ice">{ARRAY_N}</span>
             </div>
             <p className={cn("font-mono text-[10px] leading-relaxed", metrics.grating ? "text-amber-300/90" : "text-steel")}>
               {metrics.grating ? t("lab.spacingNote") : t("lab.notMeasured")}
@@ -258,7 +258,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
         <figure className="lg:col-span-2">
           <figcaption className="flex items-center justify-between">
             <span className="eyebrow text-steel">{t("lab.farField")}</span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">dB · normalised</span>
+            <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-steel">{t("lab.unitDb")}</span>
           </figcaption>
           <svg viewBox={`0 0 ${width} ${height}`} className="chart-svg mt-3 w-full" role="img" aria-label={t("lab.title")}>
             <defs>
@@ -406,9 +406,6 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
               className="chart-grid"
             />
           </svg>
-          <p className="mt-2 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-steel">
-            {t("lab.phase")} λ/2
-          </p>
         </figure>
       </div>
 

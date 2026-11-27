@@ -4,8 +4,16 @@ dist/
 .tmp/
 screenshots/
 .screenshots/
+lighthouse-report/
+playwright-report/
+test-results/
+coverage/
+.vscode/
+.idea/
 *.local
 *.log
+*.pem
+*.key
 .DS_Store
 Thumbs.db
 .env

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   children: ReactNode;
@@ -14,6 +15,7 @@ type Props = {
  * while the initial document avoids hundreds of inert nodes.
  */
 export function DeferredLab({ children, minHeight = 560, className }: Props) {
+  const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -47,7 +49,7 @@ export function DeferredLab({ children, minHeight = 560, className }: Props) {
           aria-hidden="true"
         >
           <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-steel/60">
-            instrument
+            {t("lab.placeholder")}
           </span>
           <span className="size-1.5 rounded-full bg-glow/50" />
         </div>
