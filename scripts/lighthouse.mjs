@@ -18,6 +18,7 @@
  */
 import fs from "node:fs/promises";
 import path from "node:path";
+import chromeLauncher from "chrome-launcher";
 import lighthouse from "lighthouse";
 
 const argv = process.argv.slice(2);
@@ -162,10 +163,11 @@ function extract(lhr) {
   };
 }
 
-async function runOnce(variant, index) {
+async function runOnce(variant, index, port) {
   const settings = VARIANTS[variant].settings;
   const started = Date.now();
   const runner = await lighthouse(url, {
+    port,
     output: "json",
     logLevel: "error",
     onlyCategories: ["performance", "accessibility", "best-practices", "seo"],
@@ -173,7 +175,6 @@ async function runOnce(variant, index) {
     screenEmulation: { mobile: true, width: 412, height: 823, deviceScaleFactor: 1.75, disabled: false },
     throttlingMethod: "simulate",
     ...settings,
-    chromeFlags: ["--headless=new", "--no-sandbox", "--disable-dev-shm-usage"],
   });
   if (!runner) throw new Error(`Lighthouse returned no result for ${variant}`);
   const result = extract(runner.lhr);
@@ -218,7 +219,7 @@ const table = (rows) => {
   const divider = "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |";
   const body = rows.map(
     (row) =>
-      `| ${row.title} | ${row.runs} | ${row.performance ?? "â€“"} | ${row.accessibility ?? "â€“"} | ${row.bestPractices ?? "â€“"} | ${row.seo ?? "â€“"} | ${row.fcp ?? "â€“"} | ${row.lcp ?? "â€“"} | ${row.tbt ?? "â€“"} | ${row.cls ?? "â€“"} | ${row.styleLayout ?? "â€“"} | ${row.scriptEvaluation ?? "â€“"} | ${(row.fontBytes ? row.fontBytes / 1024 : 0).toFixed(1)} KiB |`,
+      `| ${row.title} | ${row.runs} | ${row.performance ?? "â€?} | ${row.accessibility ?? "â€?} | ${row.bestPractices ?? "â€?} | ${row.seo ?? "â€?} | ${row.fcp ?? "â€?} | ${row.lcp ?? "â€?} | ${row.tbt ?? "â€?} | ${row.cls ?? "â€?} | ${row.styleLayout ?? "â€?} | ${row.scriptEvaluation ?? "â€?} | ${(row.fontBytes ? row.fontBytes / 1024 : 0).toFixed(1)} KiB |`,
   );
   return [header, divider, ...body].join("\n");
 };
@@ -228,28 +229,40 @@ const variants = only ?? ["baseline", "fast-network", "no-cpu", "no-js", "no-fon
 const summaries = [];
 const allRuns = [];
 
-for (const variant of variants) {
-  if (!VARIANTS[variant]) throw new Error(`Unknown variant: ${variant}`);
-  const runs = VARIANTS[variant].runs;
-  const results = [];
-  for (let index = 1; index <= runs; index += 1) {
-    process.stdout.write(`${label} Â· ${variant} run ${index}/${runs} â€¦ `);
-    const { result, lhr } = await runOnce(variant, index);
-    results.push(result);
-    allRuns.push(result);
-    const file = path.join(outDir, `${variant}-${index}.json`);
-    await fs.writeFile(file, JSON.stringify(lhr));
-    console.log(
-      `perf ${result.scores.performance ?? "â€“"} Â· tbt ${result.metrics.tbt ?? "â€“"}ms Â· fcp ${result.metrics.fcp ?? "â€“"}ms Â· ${result.durationMs}ms`,
-    );
+const chrome = await chromeLauncher.launch({
+  chromeFlags: [
+    "--headless=new",
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-extensions",
+  ],
+});
+try {
+  for (const variant of variants) {
+    if (!VARIANTS[variant]) throw new Error(`Unknown variant: ${variant}`);
+    const runs = VARIANTS[variant].runs;
+    const results = [];
+    for (let index = 1; index <= runs; index += 1) {
+      process.stdout.write(`${label} Â· ${variant} run ${index}/${runs} â€?`);
+      const { result, lhr } = await runOnce(variant, index, chrome.port);
+      results.push(result);
+      allRuns.push(result);
+      const file = path.join(outDir, `${variant}-${index}.json`);
+      await fs.writeFile(file, JSON.stringify(lhr));
+      console.log(
+        `perf ${result.scores.performance ?? "â€?} Â· tbt ${result.metrics.tbt ?? "â€?}ms Â· fcp ${result.metrics.fcp ?? "â€?}ms Â· ${result.durationMs}ms`,
+      );
+    }
+    summaries.push(summarize(variant, results));
   }
-  summaries.push(summarize(variant, results));
+} finally {
+  await chrome.kill();
 }
 
 const baseline = summaries.find((row) => row.variant === "baseline");
 const diagnostic = summaries.filter((row) => row.variant !== "baseline");
 const lines = [
-  `# Lighthouse mobile â€” ${label}`,
+  `# Lighthouse mobile â€?${label}`,
   "",
   `Measured ${new Date().toISOString()} against ${url}. Baseline: ${baseline?.runs ?? 0} runs; diagnostics: ${diagnostic[0]?.runs ?? 0} runs each. Median values.`,
   "",
@@ -265,18 +278,18 @@ const lines = [
   "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
   ...allRuns.map(
     (run) =>
-      `| ${run.variant} | ${run.run} | ${run.scores.performance ?? "â€“"} | ${run.metrics.tbt ?? "â€“"} | ${run.metrics.fcp ?? "â€“"} | ${run.metrics.lcp ?? "â€“"} | ${run.benchmarkIndex ?? "â€“"} |`,
+      `| ${run.variant} | ${run.run} | ${run.scores.performance ?? "â€?} | ${run.metrics.tbt ?? "â€?} | ${run.metrics.fcp ?? "â€?} | ${run.metrics.lcp ?? "â€?} | ${run.benchmarkIndex ?? "â€?} |`,
   ),
   "",
   "## Diagnostics",
   "",
   ...summaries.map(
     (row) =>
-      `- **${row.title}** â€” FCP ${row.fcp} ms, LCP ${row.lcp} ms, TBT ${row.tbt} ms, style/layout ${row.styleLayout} ms, script eval ${row.scriptEvaluation} ms, fonts ${(row.fontBytes / 1024).toFixed(1)} KiB in ${row.fontCount} request(s), WebGL requests ${row.webglRequests}.`,
+      `- **${row.title}** â€?FCP ${row.fcp} ms, LCP ${row.lcp} ms, TBT ${row.tbt} ms, style/layout ${row.styleLayout} ms, script eval ${row.scriptEvaluation} ms, fonts ${(row.fontBytes / 1024).toFixed(1)} KiB in ${row.fontCount} request(s), WebGL requests ${row.webglRequests}.`,
   ),
   "",
   baseline?.lcpElement
-    ? `LCP element: \`${baseline.lcpElement.selector}\` â€” ${baseline.lcpElement.label ?? ""}. LCP phases: ${JSON.stringify(baseline.lcpPhases)}.`
+    ? `LCP element: \`${baseline.lcpElement.selector}\` â€?${baseline.lcpElement.label ?? ""}. LCP phases: ${JSON.stringify(baseline.lcpPhases)}.`
     : "",
   "",
 ];
