@@ -228,7 +228,7 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
               <span className="text-ice">{ARRAY_N}</span>
             </div>
             <p className={cn("font-mono text-[10px] leading-relaxed", metrics.grating ? "text-amber-300/90" : "text-steel")}>
-              {metrics.grating ? t("lab.spacingNote") : t("lab.notMeasured")}
+              {t("lab.spacingNote")}
             </p>
           </div>
         </div>
@@ -344,12 +344,12 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
         </figure>
 
         <figure className="flex flex-col">
-          <figcaption className="eyebrow text-steel">{t("lab.farField")} · polar</figcaption>
+          <figcaption className="eyebrow text-steel">{t("lab.farField")} · {t("lab.polar")}</figcaption>
           <svg
             viewBox="0 0 280 170"
             className="chart-svg mt-2 w-full max-w-[260px] self-center"
             role="img"
-            aria-label={`${t("lab.farField")} polar cut`}
+            aria-label={`${t("lab.farField")} ${t("lab.polar")}`}
           >
             {[0.25, 0.5, 0.75, 1].map((ratio) => (
               <path
@@ -424,7 +424,6 @@ export default function ArrayFactorLab({ className }: { className?: string }) {
           </div>
         </div>
         <div className="flex flex-col gap-1.5 md:items-end md:text-right">
-          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-glow/80">{t("lab.notMeasured")}</span>
           <p className="max-w-xs text-[11px] leading-relaxed text-steel">{t("lab.caption")}</p>
         </div>
       </div>

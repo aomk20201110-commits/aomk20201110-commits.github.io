@@ -45,9 +45,6 @@ function LabPanel({ tab }: { tab: LabTab }) {
   return (
     <div key={tab}>
       <Component />
-      {tab === "array" ? (
-        <p className="caption mt-4 max-w-2xl">{t("home.labCaption")}</p>
-      ) : null}
     </div>
   );
 }

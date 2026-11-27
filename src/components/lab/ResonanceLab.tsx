@@ -318,7 +318,6 @@ export default function ResonanceLab({ className }: { className?: string }) {
           {t("resonance.criterion")}: <span className="text-mist" dangerouslySetInnerHTML={{ __html: criterionHtml }} />
         </p>
         <div className="flex flex-col gap-1.5 md:items-end md:text-right">
-          <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-glow/80">{t("resonance.notMeasured")}</span>
           <p className="max-w-xs text-[11px] leading-relaxed text-steel">{t("resonance.caption")}</p>
         </div>
       </div>

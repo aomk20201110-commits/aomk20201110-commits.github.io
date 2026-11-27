@@ -132,7 +132,7 @@ export const zh: Dictionary = {
     workCta: "浏览科研与项目",
     honorsEyebrow: "荣誉与成果",
     honorsTitle: "经得起核对的记录。",
-    honorsLede: "连续两届全国大学生数学竞赛（非数学类 A 组）初赛省级一等奖、美国大学生数学建模竞赛 Honorable Mention，以及校级荣誉。",
+    honorsLede: "连续两届全国大学生数学竞赛（CMC，非数学类 A 组）省级初赛一等奖、美国大学生数学建模竞赛 Honorable Mention，以及校级荣誉。",
     honorsCta: "查看完整记录",
     timelineEyebrow: "学术时间线",
     timelineTitle: "自 2025 年起。",
@@ -306,7 +306,7 @@ export const zh: Dictionary = {
     categoryCompetition: "学科竞赛",
     timelineNote: "仅记录已确认的节点。",
     featuredTitle: "连续两届省级一等奖。",
-    featuredBody: "全国大学生数学竞赛（非数学类 A 组）第十七届、第十八届均获省级初赛一等奖。这是省级奖项，并未进入全国总决赛。",
+    featuredBody: "全国大学生数学竞赛（CMC，非数学类 A 组）第十七届、第十八届均获省级初赛一等奖。这是省级奖项，并未进入全国总决赛。",
     competitionsTitle: "学科竞赛",
     competitionsLede: "数学、建模与英语方向，共五项已确认成绩。",
     scholarshipsTitle: "校级奖学金",
@@ -383,7 +383,7 @@ export const zh: Dictionary = {
     serviceLede: "按角色与目的描述公开活动，不公开具体地点、学校与参与者。",
     publicRecordTitle: "公开信息范围",
     publicRecordBody:
-      "本站只公开经批准的细节：公开名称、学校、学位项目、年份、城市、研究兴趣、已确认的荣誉与资质、训练经历及公开链接。不包含任何私人或未发表材料。",
+      "本站只公开已获准公开的细节：公开名称、学校、学位项目、年份、城市、研究兴趣、已确认的荣誉与资质、训练经历及公开链接。不包含任何私人或未发表材料。",
   },
   notes: {
     eyebrow: "研究笔记",

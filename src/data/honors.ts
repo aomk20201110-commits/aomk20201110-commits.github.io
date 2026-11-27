@@ -58,9 +58,9 @@ export const honors: Honor[] = [
     id: "cmc-18",
     title: l(
       "18th Chinese Mathematics Competition (CMC) — Non-Mathematics Category A, provincial preliminary",
-      "第十八届全国大学生数学竞赛（非数学类 A 组）省级初赛",
+      "第十八届全国大学生数学竞赛（CMC，非数学类 A 组）省级初赛",
     ),
-    organisation: l("Chinese Mathematics Competition", "中国大学生数学竞赛"),
+    organisation: l("Chinese Mathematics Competition", "全国大学生数学竞赛"),
     category: "competition",
     period: l("18th edition", "第十八届"),
     year: 2026,
@@ -76,9 +76,9 @@ export const honors: Honor[] = [
     id: "cmc-17",
     title: l(
       "17th Chinese Mathematics Competition (CMC) — Non-Mathematics Category A, provincial preliminary",
-      "第十七届全国大学生数学竞赛（非数学类 A 组）省级初赛",
+      "第十七届全国大学生数学竞赛（CMC，非数学类 A 组）省级初赛",
     ),
-    organisation: l("Chinese Mathematics Competition", "中国大学生数学竞赛"),
+    organisation: l("Chinese Mathematics Competition", "全国大学生数学竞赛"),
     category: "competition",
     period: l("17th edition", "第十七届"),
     year: 2025,
@@ -125,7 +125,7 @@ export const honors: Honor[] = [
     period: l("23rd edition", "第二十三届"),
     year: 2025,
     timelineYear: 2025,
-    rank: l("Second Prize, Provincial Level", "省级二等奖"),
+    rank: l("Second Prize, Jiangsu Province", "江苏省二等奖"),
   },
   {
     id: "word-master-6",
